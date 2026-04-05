@@ -9,7 +9,7 @@
   // Read config from script tag
   const script = document.currentScript;
   const apiKey = script.getAttribute("data-api-key") || "default-key";
-  const apiUrl = script.getAttribute("data-api-url") || "https://hook.us1.make.com/YOUR_WEBHOOK_ID";
+  const apiUrl = script.getAttribute("data-api-url") || "https://hook.us2.make.com/kkyfx0yc5b82h9qpqo6v6hecdlxms0qb";
   const businessId = script.getAttribute("data-business-id") || "unknown-business";
   const title = script.getAttribute("data-title") || "Chat with us";
   const welcome = script.getAttribute("data-welcome-message") || "Hi! Ask me anything about this business.";
@@ -89,7 +89,6 @@
         message: text,
         businessId: businessDrawId,
         threadId: threadId,
-        pageUrl: window.location.href,
       }),
     })
       .then((response) => {
