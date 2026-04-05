@@ -130,6 +130,7 @@
     });
 
     function sendMessage() {
+      console.log("Send Message");
       const text = chatInput.value.trim();
       if (!text) return;
 
@@ -139,6 +140,7 @@
       const tempId = "temp-" + Date.now();
       addMessage("...", "ai", tempId);
 
+      console.log("Sending to Webhook");
       fetch(MAKE_WEBHOOK_URL, {
         method: "POST",
         headers: {
