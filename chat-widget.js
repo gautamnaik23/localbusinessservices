@@ -1,71 +1,133 @@
-// chat-widget.js – embeddable AI chat widget with fresh thread each visit
+// chat-widget.js – embeddable chat widget
 
 (function () {
   "use strict";
 
-  // NEW thread on every page load
-  const threadId = "thread-" + Math.random().toString(36).substr(2, 9);
+  // Read config from window
+  const MAKE_WEBHOOK_URL = window.MAKE_WEBHOOK_URL || "https://hook.us2.make.com/kkyfx0yc5b82h9qpqo6v6hecdlxms0qb";
+  const API_KEY = window.API_KEY || "your-api-key";
+  const BUSINESS_ID = window.BUSINESS_ID || "unknown-business";
+  const threadId = window.threadId || "thread-" + Math.random().toString(36).substr(2, 9);
 
-  // Read config from script tag
-  const script = document.currentScript;
-  const apiKey = script.getAttribute("data-api-key") || "default-key";
-  const apiUrl = script.getAttribute("data-api-url") || "https://hook.us2.make.com/kkyfx0yc5b82h9qpqo6v6hecdlxms0qb";
-  const businessId = script.getAttribute("data-business-id") || "unknown-business";
-  const title = script.getAttribute("data-title") || "Chat with us";
-  const welcome = script.getAttribute("data-welcome-message") || "Hi! Ask me anything about this business.";
-  const placeholder = script.getAttribute("data-input-placeholder") || "Type your question...";
-
-  let chatWidget = null;
-  let chatMessages = null;
-  let chatInput = null;
-  let chatSend = null;
-
-  function createWidget() {
+  // Create chat widget UI
   const container = document.createElement("div");
   container.id = "chat-widget-container";
   container.innerHTML = `
-    <div id="chatWidget" style="position: fixed; bottom: 40px; right: 40px; width: 360px; height: 440px; border: 6px solid red; border-radius: 16px; box-shadow: 0 8px 24px rgba(255,0,0,0.3); background: #ffe6e6; overflow: hidden; z-index: 10000; display: none;">
-      <div id="chatHeader" style="padding: 20px 24px; background: #d32f2f; color: white; font-size: 18px; font-weight: 600;">${title}</div>
-      <div id="chatMessages" style="height: 300px; padding: 20px 24px; overflow-y: auto; font-size: 16px; color: #333; background: #fff;"></div>
-      <div id="chatInputContainer" style="display: flex; padding: 16px 20px; border-top: 3px solid #d32f2f;">
-        <input id="chatInput" type="text" placeholder="${placeholder}" style="flex-grow: 1; padding: 12px 16px; border: 2px solid #d32f2f; border-radius: 20px; font-size: 16px; background: #fff;" />
-        <button id="chatSend" style="margin-left: 10px; padding: 0 20px; border: none; background: #d32f2f; color: white; border-radius: 20px; font-size: 16px; cursor: pointer;">Send</button>
+    <style>
+      .chat-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 360px;
+        height: 520px;
+        border: 1px solid #ddd;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        background: #f8f9fa;
+        overflow: hidden;
+        z-index: 10000;
+        display: none;
+      }
+      .chat-header {
+        padding: 18px 24px;
+        background: #0d6efd;
+        color: white;
+        font-size: 17px;
+        font-weight: 500;
+      }
+      .chat-messages {
+        height: 340px;
+        padding: 16px 20px;
+        overflow-y: auto;
+        font-size: 15px;
+        color: #333;
+        background: #fff;
+      }
+      .chat-message {
+        margin: 8px 0;
+        word-wrap: break-word;
+        line-height: 1.4;
+      }
+      .chat-message.user {
+        text-align: right;
+      }
+      .chat-message.ai {
+        text-align: left;
+        background: #f1f8ff;
+        padding: 10px 12px;
+        border-radius: 12px;
+        max-width: 85%;
+        display: inline-block;
+      }
+      .chat-input {
+        display: flex;
+        padding: 16px 20px;
+        border-top: 1px solid #e0e0e0;
+        background: #fff;
+      }
+      .chat-input input {
+        flex-grow: 1;
+        padding: 12px 16px;
+        border: 1px solid #ced4da;
+        border-radius: 12px;
+        font-size: 15px;
+        background: #fff;
+        color: #333;
+      }
+      .chat-input button {
+        margin-left: 10px;
+        padding: 0 18px;
+        border: none;
+        background: #0d6efd;
+        color: white;
+        border-radius: 12px;
+        font-size: 15px;
+        cursor: pointer;
+      }
+      .chat-toggle {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        width: 60px;
+        height: 60px;
+        background: #0d6efd;
+        border-radius: 30px;
+        box-shadow: 0 4px 16px rgba(13, 110, 253, 0.3);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 10001;
+      }
+    </style>
+
+    <div class="chat-widget" id="chatWidget">
+      <div class="chat-header">Chat with us</div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-message ai">Hi! Ask me anything about this business.</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type your question..." />
+        <button id="chatSend">Send</button>
       </div>
     </div>
-    <div id="chatToggle" style="position: fixed; bottom: 40px; right: 40px; width: 64px; height: 64px; background: #d32f2f; border-radius: 32px; box-shadow: 0 8px 24px rgba(255,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; z-index: 10001;">💬</div>
+
+    <div class="chat-toggle" id="chatToggle">💬</div>
   `;
+  document.body.appendChild(container);
 
-    document.body.appendChild(container);
+  const chatWidget = document.getElementById("chatWidget");
+  const chatToggle = document.getElementById("chatToggle");
+  const chatMessages = document.getElementById("chatMessages");
+  const chatInput = document.getElementById("chatInput");
+  const chatSend = document.getElementById("chatSend");
 
-    chatWidget = document.getElementById("chatWidget");
-    chatMessages = document.getElementById("chatMessages");
-    chatInput = document.getElementById("chatInput");
-    chatSend = document.getElementById("chatSend");
-    const chatToggle = document.getElementById("chatToggle");
-
-    addMessage(welcome, "ai");
-
-    // Toggle open/close
-    chatToggle.addEventListener("click", () => {
-      chatWidget.style.display =
-        chatWidget.style.display === "block" ? "none" : "block";
-    });
-
-    // Send message
-    chatSend.addEventListener("click", sendMessage);
-    chatInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-  }
-
-  function addMessage(text, role, id = null) {
-    const p = document.createElement("p");
-    p.className = `chat-message ${role}`;
-    if (id) p.id = id;
-    p.textContent = text;
-    chatMessages.appendChild(p);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
+  chatToggle.addEventListener("click", () => {
+    chatWidget.style.display =
+      chatWidget.style.display === "block" ? "none" : "block";
+  });
 
   function sendMessage() {
     const text = chatInput.value.trim();
@@ -77,23 +139,20 @@
     const tempId = "temp-" + Date.now();
     addMessage("...", "ai", tempId);
 
-    // POST to Make webhook with threadId
-    fetch(apiUrl, {
+    fetch(MAKE_WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-Key": apiKey,
+        "X-API-Key": API_KEY,
       },
       body: JSON.stringify({
         message: text,
-        businessId: businessDrawId,
+        businessId: BUSINESS_ID,
         threadId: threadId,
+        pageUrl: window.location.href,
       }),
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("HTTP error: " + response.status);
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         const tempEl = document.getElementById(tempId);
         if (tempEl) {
@@ -108,10 +167,17 @@
       });
   }
 
-  // Bootstrap
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", createWidget);
-  } else {
-    createWidget();
+  function addMessage(text, role, id) {
+    const p = document.createElement("p");
+    p.className = "chat-message " + role;
+    if (id) p.id = id;
+    p.textContent = text;
+    chatMessages.appendChild(p);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
+
+  chatSend.addEventListener("click", sendMessage);
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
 })();
