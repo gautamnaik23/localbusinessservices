@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Widget</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    #chat-container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+
+    .message {
+      margin: 8px 0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      max-width: 75%;
+    }
+
+    .user {
+      background: #007bff;
+      color: white;
+      margin-left: auto;
+    }
+
+    .bot {
+      background: #e5e5ea;
+      color: black;
+      margin-right: auto;
+    }
+
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+
+    #send {
+      padding: 10px 15px;
+      border: none;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    #send:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat-container">
+  <div id="messages"></div>
+
+  <div id="input-area">
+    <input id="input" placeholder="Type a message..." />
+    <button id="send">Send</button>
+  </div>
+</div>
+
+<script>
+  const webhookUrl = "https://hook.us2.make.com/kkyfx0yc5b82h9qpqo6v6hecdlxms0qb";
+  const businessId = "demo_business";
+
+  let threadId = localStorage.getItem("thread_id");
+
+  if (!threadId) {
+    threadId = "thread_" + Math.random().toString(36).substring(2);
+    localStorage.setItem("thread_id", threadId);
+  }
+
+  const messagesDiv = document.getElementById("messages");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("send");
+
+  function addMessage(text, sender) {
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+    msg.innerText = text;
+    messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    addMessage("Typing...", "bot");
+
+    try {
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: text,
+          thread_id: threadId,
+          business_id: businessId
+        })
+      });
+
+      const data = await res.json();
+
+      messagesDiv.lastChild.remove(); // remove "Typing..."
+
+      addMessage(data.message || "Error getting response", "bot");
+
+    } catch (err) {
+      messagesDiv.lastChild.remove();
+      addMessage("Error connecting to server", "bot");
+    }
+  }
+
+  sendBtn.onclick = sendMessage;
+
+  input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
+</body>
+</html>
