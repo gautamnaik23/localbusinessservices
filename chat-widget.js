@@ -21,20 +21,20 @@
   let chatSend = null;
 
   function createWidget() {
-    const container = document.createElement("div");
-    container.style.display = "none";
-    container.id = "chat-widget-container";
-    container.innerHTML = `
-      <div id="chatWidget" style="position: fixed; bottom: 20px; right: 20px; width: 320px; height: 400px; border: 1px solid #ccc; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); background: white; overflow: hidden; z-index: 10000;">
-        <div id="chatHeader" style="padding: 14px 16px; background: #1a73e8; color: white; font-size: 16px; font-weight: 500;">${title}</div>
-        <div id="chatMessages" style="height: 280px; padding: 12px 16px; overflow-y: auto; font-size: 14px; color: #202124;"></div>
-        <div id="chatInputContainer" style="display: flex; padding: 10px; border-top: 1px solid #ddd;">
-          <input id="chatInput" type="text" placeholder="${placeholder}" style="flex-grow: 1; padding: 9px 12px; border: 1px solid #ddd; border-radius: 16px; font-size: 14px;" />
-          <button id="chatSend" style="margin-left: 6px; padding: 0 12px; border: none; background: #1a73e8; color: white; border-radius: 16px; font-size: 14px; cursor: pointer;">Send</button>
-        </div>
+  const container = document.createElement("div");
+  container.id = "chat-widget-container";
+  container.innerHTML = `
+    <div id="chatWidget" style="position: fixed; bottom: 40px; right: 40px; width: 360px; height: 440px; border: 6px solid red; border-radius: 16px; box-shadow: 0 8px 24px rgba(255,0,0,0.3); background: #ffe6e6; overflow: hidden; z-index: 10000; display: none;">
+      <div id="chatHeader" style="padding: 20px 24px; background: #d32f2f; color: white; font-size: 18px; font-weight: 600;">${title}</div>
+      <div id="chatMessages" style="height: 300px; padding: 20px 24px; overflow-y: auto; font-size: 16px; color: #333; background: #fff;"></div>
+      <div id="chatInputContainer" style="display: flex; padding: 16px 20px; border-top: 3px solid #d32f2f;">
+        <input id="chatInput" type="text" placeholder="${placeholder}" style="flex-grow: 1; padding: 12px 16px; border: 2px solid #d32f2f; border-radius: 20px; font-size: 16px; background: #fff;" />
+        <button id="chatSend" style="margin-left: 10px; padding: 0 20px; border: none; background: #d32f2f; color: white; border-radius: 20px; font-size: 16px; cursor: pointer;">Send</button>
       </div>
-      <div id="chatToggle" style="position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; background: #1a73e8; border-radius: 28px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; z-index: 10001;">💬</div>
-    `;
+    </div>
+    <div id="chatToggle" style="position: fixed; bottom: 40px; right: 40px; width: 64px; height: 64px; background: #d32f2f; border-radius: 32px; box-shadow: 0 8px 24px rgba(255,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; z-index: 10001;">💬</div>
+  `;
+  document.body.appendChild(container);
 
     document.body.appendChild(container);
 
