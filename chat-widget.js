@@ -16,7 +16,7 @@
     <style>
       .chat-widget {
         position: fixed;
-        bottom: 20px;
+        bottom: 70px;
         right: 20px;
         width: 360px;
         height: 520px;
