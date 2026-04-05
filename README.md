@@ -10,4 +10,4 @@ xml
   window.threadId = "thread-" + Math.random().toString(36).substr(2, 9);
 </script>
 
-<script src="https://yourusername.github.io/chat-widget/chat-widget.js" defer></script>
+<script src="https://yourusername.github.io/localbusinessservices/chat-widget.js" defer></script>
