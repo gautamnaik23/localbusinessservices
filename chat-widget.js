@@ -34,7 +34,6 @@
     </div>
     <div id="chatToggle" style="position: fixed; bottom: 40px; right: 40px; width: 64px; height: 64px; background: #d32f2f; border-radius: 32px; box-shadow: 0 8px 24px rgba(255,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; z-index: 10001;">💬</div>
   `;
-  document.body.appendChild(container);
 
     document.body.appendChild(container);
 
