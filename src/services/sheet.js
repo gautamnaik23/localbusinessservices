@@ -1,15 +1,20 @@
 // src/services/sheets.js
-// Handles authentication and access to the Google Sheets API.
-// This file will be used by all other services that need to read/write data.
+// Complete Google Sheets service for your two-tab structure.
+// This handles authentication, reading, and writing to your conversation and appointment tabs.
 
 import { google } from "googleapis";
 
-function getAuth() {
-  // Google service account private keys often arrive with literal "\n"
-  // in environment variables, so we convert them back into real newlines.
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+// SHEET CONFIGURATION - Update these with your actual sheet and tab names
+const SHEET_CONFIG = {
+  spreadsheetId: process.env.GOOGLE_SHEET_ID, // Your full Google Sheets ID
+  conversationTab: "Conversation History", // Your first tab name
+  appointmentsTab: "AppointmentFakeTable"  // Your second tab name
+};
 
-  // Create a JWT auth client for the service account.
+// Auth setup - converts the PEM key from environment variable format
+function getAuth() {
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  
   return new google.auth.JWT(
     process.env.GOOGLE_CLIENT_EMAIL,
     null,
@@ -19,12 +24,99 @@ function getAuth() {
 }
 
 export async function getSheetsClient() {
-  // Create the auth client.
   const auth = getAuth();
-
-  // Authorize before using the Sheets API.
   await auth.authorize();
-
-  // Return the Sheets client for v4 API access.
   return google.sheets({ version: "v4", auth });
+}
+
+// Read the conversation tab and return all rows
+export async function getConversationHistory(businessId, threadId, sessionId) {
+  const sheets = await getSheetsClient();
+  
+  // Read all rows from the conversation tab
+  const range = `${SHEET_CONFIG.conversationTab}!A:H`;
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_CONFIG.spreadsheetId,
+    range
+  });
+  
+  const rows = response.data.values || [];
+  
+  // Filter to only this business and thread and session Id
+  return rows.filter(row => {
+    if (row.length < 8) return false;
+    return row[7] === businessId && row[0] === threadId && row[1] === sessionId; // business ID is column H (index 7)
+  });
+}
+
+// Add a new message to the conversation tab
+export async function saveMessage(businessId, threadId, sessionId, messenger, message, replyNeeded, followUp) {
+  const sheets = await getSheetsClient();
+  
+  // Prepare the row data matching your tab structure
+  const newRow = [
+    threadId,           // Column A
+    sessionId,          // Column B  
+    messenger,          // Column C
+    message,            // Column D
+    new Date().toISOString(), // Column E - timestamp
+    replyNeeded,        // Column F
+    followUp,           // Column G
+    businessId          // Column H
+  ];
+  
+  // Append the row to the conversation tab
+  const range = `${SHEET_CONFIG.conversationTab}`;
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_CONFIG.spreadsheetId,
+    range,
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS", // Ensures new rows are added, not overwriting
+    resource: { values: [newRow] }
+  });
+  
+  console.log(`Saved message for business ${businessId}, thread ${threadId}`);
+  return true;
+}
+
+// Read appointments for a business
+export async function getAppointments(businessId) {
+  const sheets = await getSheetsClient();
+  
+  const range = `${SHEET_CONFIG.appointmentsTab}!A:F`;
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_CONFIG.spreadsheetId,
+    range
+  });
+  
+  const rows = response.data.values || [];
+  
+  // Filter to this business only (column F)
+  return rows.filter(row => row.length >= 6 && row[5] === businessId);
+}
+
+// Save or update appointment row
+export async function saveAppointment(threadId, appointmentTime, reminder24h, reminder2h, reviewSent, businessId) {
+  const sheets = await getSheetsClient();
+  
+  const newRow = [
+    threadId,           // Column A
+    appointmentTime,    // Column B
+    reminder24h,        // Column C
+    reminder2h,         // Column D
+    reviewSent,         // Column E
+    businessId          // Column F
+  ];
+  
+  const range = `${SHEET_CONFIG.appointmentsTab}`;
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_CONFIG.spreadsheetId,
+    range,
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    resource: { values: [newRow] }
+  });
+  
+  console.log(`Saved appointment for business ${businessId}`);
+  return true;
 }
