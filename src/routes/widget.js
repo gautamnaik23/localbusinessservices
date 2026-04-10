@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
       });
     }
     // Make Session Id
-    session_id = generateSessionId();
+    const session_id = generateSessionId();
 
     
     // 1. Load business config
