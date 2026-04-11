@@ -1,60 +1,53 @@
-// src/routes/widget.js - COMPLETE VERSION
+// src/routes/widget.js - FULL VERSION
 import { Router } from "express";
-import { saveMessage } from "../services/messages.js";
+import { saveMessagesBatch } from "../services/messages.js";
 import { getBusinessConfig } from "../services/business.js";
 import { getThreadHistory } from "../services/messages.js";
 import { generateReply } from "../services/ai.js";
+import { generateSessionId } from "../utils/ids.js";
 
 const router = Router();
 
 router.post("/", async (req, res) => {
   try {
     const { business_id, thread_id, message } = req.body;
-
-    if (!business_id || !thread_id ||  !message) {
-      return res.status(400).json({
-        error: "Missing required fields: business_id, thread_id, session_id, message"
-      });
+    if (!business_id || !thread_id || !message) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-    // Make Session Id
-    const session_id = generateSessionId();
 
-    
-    // 1. Load business config
+    // 1. Generate session ID (040926 format)
+    const sessionId = generateSessionId();
+
+    // 2. Load business config FIRST
     const business = await getBusinessConfig(business_id);
-    
-    // 2. Load conversation history
-    const history = await getThreadHistory(business_id, thread_id, session_id);
-    
-    // 3. Generate AI reply
+
+    // 3. Load conversation history (EXCLUDES current message)
+    const history = await getThreadHistory(business_id, thread_id, sessionId);
+
+    // 4. Generate real AI reply using your prompt
     const aiResponse = await generateReply({
       business,
-      history,
+      history, 
       userMessage: message
     });
-    
-    // 4. Save user message
-    await saveMessage(business_id, thread_id, session_id, "user", message, false, false);
-    
-    // 5. Save AI response
-    await saveMessage(business_id, thread_id, session_id, "ai", aiResponse.message, aiResponse.replyNeeded, false);
-    
-    // 6. Return AI reply to widget
-    res.json({
-      ok: true,
-      reply: aiResponse.message
+
+    //Save user and AI messages
+    await saveMessagesBatch(business_id, thread_id, [
+  {role: 'user', text: message, replyNeeded: false, followUp: false},
+  {role: 'ai', text: aiResponse.message, replyNeeded: aiResponse.expecting_reply, followUp: false}
+]);
+
+
+    // 7. Return CLEAN reply text to widget (no JSON wrapper)
+    res.json({ 
+      ok: true, 
+      reply: aiResponse.message 
     });
-    
+
   } catch (err) {
-    console.error("Widget route error:", err);
+    console.error("Widget error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
-
-// Generate session ID as MMDDYYYY format
-function generateSessionId() {
-  const now = new Date();
-  return now.toISOString().slice(5, 10).replace(/-/g, '') + now.getFullYear().toString().slice(-2);
-}
 
 export default router;
