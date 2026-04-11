@@ -60,7 +60,7 @@ export async function getConversationHistory(businessId, threadId, sessionId) {
 }
 
 // Add a new message to the conversation tab
-export async function saveMessage(businessId, threadId, sessionId, messenger, message, replyNeeded, followUp) {
+export async function saveMessage(businessId, threadId, sessionId, messenger, message, replyNeeded, followUp, channel) {
   const sheets = await getSheetsClient();
   
   // Prepare the row data matching your tab structure
@@ -72,7 +72,8 @@ export async function saveMessage(businessId, threadId, sessionId, messenger, me
     new Date().toISOString(), // Column E - timestamp
     replyNeeded,        // Column F
     followUp,           // Column G
-    businessId          // Column H
+    businessId,          // Column H
+    channel,
   ];
   
   // Append the row to the conversation tab
