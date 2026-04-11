@@ -3,15 +3,23 @@
 // This file creates the Express app, sets up middleware,
 // serves static files, and registers webhook routes.
 
+import dotenv from "dotenv";
+dotenv.config();
+
+import fs from 'fs';
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import widgetRoutes from "./routes/widget.js";
 
-dotenv.config();
+// DEBUG .env LOADING
+//console.log('📂 ROOT:', process.cwd());
+//console.log('📄 FILES:', fs.readdirSync('.').filter(f => f.includes('.env')));
+//console.log('🔑 CLIENT:', !!process.env.GOOGLE_CLIENT_EMAIL ? '✅' : '❌');
+//console.log('🔑 KEY:', !!process.env.GOOGLE_PRIVATE_KEY ? '✅' : '❌');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
