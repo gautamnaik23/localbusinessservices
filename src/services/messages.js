@@ -8,13 +8,13 @@ const MESSAGES_TAB = 'Conversation History';  // Your messages tab
 
 
 // Replace saveMessage calls in widget.js with ONE batch:
-export async function saveMessagesBatch(businessId, threadId, messages) {  // messages = [{role, text, replyNeeded, followUp}]
+export async function saveMessagesBatch(businessId, threadId, messages, channel) {  // messages = [{role, text, replyNeeded, followUp}]
   const sheets = await getSheetsClient();
   const timestamp = new Date().toISOString();
   const sessionId = generateSessionId();
   
   const values = messages.map(msg => [
-    threadId, sessionId, msg.role, msg.text, timestamp, msg.replyNeeded, msg.followUp, businessId
+    threadId, sessionId, msg.role, msg.text, timestamp, msg.replyNeeded, msg.followUp, businessId, channel
   ]);
   
   await sheets.spreadsheets.values.append({
