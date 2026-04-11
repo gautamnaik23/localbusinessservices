@@ -1,7 +1,7 @@
 // src/jobs/followups.js
 import cron from 'node-cron';
 import { getSheetsClient } from '../services/sheets.js';
-import { senders } from '../senders/router.js';  // Router imports all senders
+import { senders } from '../services/outbound.js';  // Router imports all senders
 import { generateFollowUp } from '../services/ai.js';
 
 const SHEET_ID = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM'
