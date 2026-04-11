@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI('AIzaSyBuSSx3edEzWRHhdlwOWsaVh0TM-E4RUj0');
+const genAI = new GoogleGenerativeAI(${{secrets.GEMINI_API_KEY}});
 
 /**
  * Safely extract JSON from a Gemini response.
@@ -174,4 +174,29 @@ ${userMessage}
       expecting_reply: true
     };
   }
+}
+
+// AI-personalized follow-up
+export async function generateFollowUp(history, business) {
+  const model = genAI.getGenerativeModel('gemini-3.1-flash-lite-preview');
+  const historySummary = history.slice(-5).map(row => `${row[2]}: ${row[3]}`).join('\n');
+  
+  const prompt = `Generate a short, personalized follow-up nudge based on this conversation:
+
+History:
+${historySummary}
+
+Business: ${JSON.stringify(business)}
+
+Rules:
+- Reference SPECIFIC details from history (service they asked about, timing, etc.)
+- Include booking link: ${business.bookingLink}
+- Friendly, not pushy
+- Max 1 sentence + booking link
+- End with question to re-engage
+
+Return ONLY the message text:`;
+
+  const result = await model.generateContent(prompt);
+  return result.response.text().trim();
 }
