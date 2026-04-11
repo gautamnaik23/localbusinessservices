@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI('AIzaSyBuSSx3edEzWRHhdlwOWsaVh0TM-E4RUj0');
 
 /**
  * Safely extract JSON from a Gemini response.
@@ -46,6 +46,7 @@ export async function generateReply({ business, history, userMessage }) {
   const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
   const conversationHistory = formatHistory(history);
+  console.log("CONVERSATION HISTORY: " + conversationHistory);
 
   const prompt = `
 You are a friendly and highly effective AI virtual receptionist.
@@ -60,8 +61,8 @@ ${conversationHistory || "No previous conversation history."}
 ---
 
 Business Information:
-Booking Link: ${business.bookingLink || business.booking_link || ""}
-Office Number: ${business.officeNumber || business.office_number || business.phone_number || ""}
+Booking Link: ${business.bookingLink || ""}
+Office Number: ${business.officeNumber || ""}
 FAQs: ${business.faqs || ""}
 Promotions: ${business.promotions || ""}
 
@@ -80,6 +81,7 @@ Behavior Rules (VERY IMPORTANT):
 
 2. DO NOT restart the conversation.
 - No “How can I help you?” after the first message. Make it feel natural.
+- Just because they are a new conversation does NOT mean they are a new client (consider this for promotions)
 
 3. Answer first, then guide.
 - Always answer the user’s question directly.
@@ -102,7 +104,7 @@ You may ONLY use the information explicitly provided in the Business Info sectio
   → You MUST say you don’t know.
 
 Example:
-“I’m not sure about that—please call our office at ${business.officeNumber || business.phone_number || ""} for details.”
+“I’m not sure about that—please call our office at ${business.officeNumber || ""} for details.”
 
 - NEVER provide numbers, pricing, or details unless they are explicitly given.
 - If you do not see the answer in the Business Info section, you MUST assume it is unknown.
@@ -146,9 +148,10 @@ Otherwise set it to false.
 Latest user message:
 ${userMessage}
 `;
-
+  
   try {
     const result = await model.generateContent(prompt);
+    console.log("Response to Prompt created by Gemini")
     const text = result.response.text();
 
     const parsed = parseJsonFromText(text);
