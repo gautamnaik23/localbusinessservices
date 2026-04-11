@@ -13,13 +13,23 @@ const SHEET_CONFIG = {
 
 // Auth setup - converts the PEM key from environment variable format
 function getAuth() {
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  
+  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY;
+
+  if (!clientEmail) {
+    throw new Error('Missing GOOGLE_CLIENT_EMAIL');
+  }
+  if (!rawKey) {
+    throw new Error('Missing GOOGLE_PRIVATE_KEY');
+  }
+
+  const privateKey = rawKey.replace(/\\n/g, '\n');
+
   return new google.auth.JWT(
-    process.env.GOOGLE_CLIENT_EMAIL,
+    clientEmail,
     null,
     privateKey,
-    ["https://www.googleapis.com/auth/spreadsheets"]
+    ['https://www.googleapis.com/auth/spreadsheets']
   );
 }
 
@@ -75,7 +85,7 @@ export async function saveMessage(businessId, threadId, sessionId, messenger, me
     resource: { values: [newRow] }
   });
   
-  console.log(`Saved message for business ${businessId}, thread ${threadId}`);
+  console.log(`Saved message for business ${businessId}, thread ${threadId} from sheets.js`);
   return true;
 }
 
