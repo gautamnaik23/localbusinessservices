@@ -13,7 +13,7 @@ const BUSINESS_SHEET_CONFIG = {
   officeNumberColumn: 2,        // Column C
   bookingLinkColumn: 3,         // Column D
   faqsColumn: 4,  // Column E (FAQs as comma-separated or JSON)
-  promotionsColumn: 5          // Column F (promotions/offers)
+  promotionsColumn: 5,          // Column F (promotions/offers)
   businessWebsiteColumn: 6
 };
 
@@ -33,7 +33,7 @@ export async function getBusinessConfig(businessId) {
   // Read all rows from business config tab (columns A-M to cover your structure)
   const range = `${BUSINESS_SHEET_CONFIG.tabName}!A:F`;
   const response = await sheets.spreadsheets.values.get(
-    { spreadsheetId: process.env.GOOGLESHEETID, range }
+    { spreadsheetId: process.env.GOOGLE_SHEET_ID, range }
   );
 
   const rows = response.data.values || [];
