@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
     await saveMessagesBatch(business_id, thread_id, [
   {role: 'user', text: message, replyNeeded: false, followUp: false},
   {role: 'ai', text: aiResponse.message, replyNeeded: aiResponse.expecting_reply, followUp: false}
-]);
+], 'widget');
 
 
     // 7. Return CLEAN reply text to widget (no JSON wrapper)
