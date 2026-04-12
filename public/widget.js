@@ -1,53 +1,50 @@
-// src/routes/widget.js - FULL VERSION
-import { Router } from "express";
-import { saveMessagesBatch } from "../services/messages.js";
-import { getBusinessConfig } from "../services/business.js";
-import { getThreadHistory } from "../services/messages.js";
-import { generateReply } from "../services/ai.js";
-import { generateSessionId } from "../utils/ids.js";
+// public/widget.js
+// Frontend logic for the chat widget.
+// This version sends a message to your backend and displays the response.
 
-const router = Router();
+const messagesEl = document.getElementById("messages");
+const inputEl = document.getElementById("messageInput");
+const buttonEl = document.getElementById("sendButton");
 
-router.post("/", async (req, res) => {
+// Temporary static business ID for testing.
+// Later this can be injected per business or per embed.
+const businessId = "demo_business";
+
+// Create a simple thread ID for the session.
+// Later you may want to store this in localStorage so it persists.
+const threadId = `thread_${Date.now()}`;
+
+buttonEl.addEventListener("click", async () => {
+  // Get the user's typed message.
+  const message = inputEl.value.trim();
+
+  if (!message) return;
+  // Show the user's message in the widget.
+  messagesEl.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+
   try {
-    const { business_id, thread_id, message } = req.body;
-    if (!business_id || !thread_id || !message) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // 1. Generate session ID (040926 format)
-    const sessionId = generateSessionId();
-
-    // 2. Load business config FIRST
-    const business = await getBusinessConfig(business_id);
-
-    // 3. Load conversation history (EXCLUDES current message)
-    const history = await getThreadHistory(business_id, thread_id, sessionId);
-
-    // 4. Generate real AI reply using your prompt
-    const aiResponse = await generateReply({
-      business,
-      history, 
-      userMessage: message
+    // Send the message to the backend webhook.
+    const res = await fetch("/webhook/widget", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        business_id: businessId,
+        thread_id: threadId,
+        message
+      })
     });
 
-    //Save user and AI messages
-    await saveMessagesBatch(business_id, thread_id, [
-  {role: 'user', text: message, replyNeeded: false, followUp: false},
-  {role: 'ai', text: aiResponse.message, replyNeeded: aiResponse.expecting_reply, followUp: false}
-], 'widget');
+    const data = await res.json();
 
-
-    // 7. Return CLEAN reply text to widget (no JSON wrapper)
-    res.json({ 
-      ok: true, 
-      reply: aiResponse.message 
-    });
-
+    // Show the backend response for now.
+    messagesEl.innerHTML += `<div><strong>Bot:</strong> ${JSON.stringify(data)}</div>`;
   } catch (err) {
-    console.error("Widget error:", err);
-    res.status(500).json({ error: "Server error" });
+    console.error("Widget request failed:", err);
+    messagesEl.innerHTML += `<div><strong>Bot:</strong> Error sending message.</div>`;
   }
-});
 
-export default router;
+  // Clear the input after sending.
+  inputEl.value = "";
+});
