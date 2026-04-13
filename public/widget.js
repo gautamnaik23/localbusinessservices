@@ -14,13 +14,21 @@ const businessId = "demo_business";
 // Later you may want to store this in localStorage so it persists.
 const threadId = `thread_${Date.now()}`;
 
+function addMessage(sender, text) {
+  messagesEl.innerHTML += `<div><strong>${sender}:</strong> ${text}</div>`;
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  inputEl.focus();
+}
+
+
 buttonEl.addEventListener("click", async () => {
   // Get the user's typed message.
   const message = inputEl.value.trim();
 
   if (!message) return;
   // Show the user's message in the widget.
-  messagesEl.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+   addMessage('You', message);  // ✅ Use function
+   inputEl.value = '';
 
   try {
     // Send the message to the backend webhook.
@@ -39,12 +47,18 @@ buttonEl.addEventListener("click", async () => {
     const data = await res.json();
 
     // Show the backend response for now.
-    messagesEl.innerHTML += `<div><strong>Bot:</strong> ${JSON.stringify(data)}</div>`;
+    addMessage('AI', data.reply || JSON.stringify(data));
   } catch (err) {
     console.error("Widget request failed:", err);
-    messagesEl.innerHTML += `<div><strong>Bot:</strong> Error sending message.</div>`;
+    addMessage('AI', 'Error - check console');
   }
 
-  // Clear the input after sending.
-  inputEl.value = "";
+});
+
+const socket = io();  // Connect
+socket.emit('join-thread', threadId);
+
+socket.on('nudge', (data) => {
+  console.log('🔔 Nudge:', data.message);
+  addMessage('AI', data.message);  // Auto-show!
 });

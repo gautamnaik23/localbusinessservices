@@ -3,6 +3,7 @@
 // This file creates the Express app, sets up middleware,
 // serves static files, and registers webhook routes.
 
+import './services/scheduler.js';  // 🔥 Starts crons
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,14 +12,11 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createServer } from "http";           // ✅ HTTP server
+import { Server } from "socket.io";            // ✅ WebSockets
 
 import widgetRoutes from "./routes/widget.js";
-
-// DEBUG .env LOADING
-//console.log('📂 ROOT:', process.cwd());
-//console.log('📄 FILES:', fs.readdirSync('.').filter(f => f.includes('.env')));
-//console.log('🔑 CLIENT:', !!process.env.GOOGLE_CLIENT_EMAIL ? '✅' : '❌');
-//console.log('🔑 KEY:', !!process.env.GOOGLE_PRIVATE_KEY ? '✅' : '❌');
+import { startFollowUpJob } from './jobs/followups.js';
 
 
 const app = express();
@@ -51,7 +49,27 @@ app.get("/", (req, res) => {
   res.send("AI receptionist backend is running.");
 });
 
+// 🚀 WEBSOCKETS + HTTP SERVER
+const httpServer = createServer(app);
+const io = new Server(httpServer, { 
+  cors: { origin: '*' } 
+});
+
+io.on('connection', (socket) => {
+  console.log('✅ Widget connected:', socket.id);
+  socket.on('join-thread', (threadId) => {
+    socket.join(threadId);
+    console.log(`Widget joined: ${threadId}`);
+  });
+});
+
+// Export io for followups
+export { io };
+
+
+startFollowUpJob();  // 🔥 Starts cron
+
 // Start the server.
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server + WebSockets on port ${PORT}`);
 });

@@ -1,14 +1,18 @@
 // src/jobs/followups.js
+import { io } from '../server.js';  // ✅ WebSocket push!
 import cron from 'node-cron';
 import { getSheetsClient } from '../services/sheets.js';
 import { senders } from '../services/outbound.js';  // Router imports all senders
 import { generateFollowUp } from '../services/ai.js';
+import { getThreadHistory } from '../services/messages.js';
+import { getBusinessConfig } from '../services/business.js';
 
 const SHEET_ID = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM'
 const MESSAGES_TAB = 'Conversation History';
 
 export function startFollowUpJob() {
-  cron.schedule('0 */2 * * *', async () => {
+  cron.schedule('* * * * *', async () => {  // Every 1min for testing
+  //cron.schedule('0 */2 * * *', async () => { //every 2 hours
     console.log('🔔 Checking follow-ups...');
     const sheets = await getSheetsClient();
     
@@ -19,31 +23,40 @@ export function startFollowUpJob() {
     
     const rows = response.data.values || [];
     const now = new Date();
-    const staleThreads = [];
     
-    // Filter-first: replyNeeded=true, followUp=false (last msg per thread)
-    const candidates = rows.filter(row => row[5] === 'true' && row[6] === 'false');
-    const lastPerThread = {};
-    
-    for (const row of candidates.slice().reverse()) {
+    // Group by threadId → check LATEST replyNeeded/followUp pair
+    const threadStates = {};
+    const seen = new Set();
+    for (const row of rows.slice().reverse()) {  // Newest first
       const threadId = row[0];
-      if (!lastPerThread[threadId]) {
+      //console.log(rows.indexOf(row) + ": " + !seen.has(threadId))
+      if (!threadStates[threadId] && !seen.has(threadId)) {
+        const replyNeeded = row[5] === 'TRUE';
+        const followUp = row[6] === 'FALSE';
         const hoursSilence = (now - new Date(row[4])) / (1000 * 60 * 60);
-        if (hoursSilence > 2) {
-          lastPerThread[threadId] = {
-            threadId, businessId: row[7], channel: row[8], rowIndex: rows.indexOf(row)
-          };
+    
+        if (replyNeeded && followUp && hoursSilence > 0.02) {
+            threadStates[threadId] = {
+              threadId, 
+              businessId: row[7], 
+              channel: row[8], 
+              rowIndex: rows.indexOf(row),
+              timestamp: row[4], 
+              sessionId: row[1]
+            };
         }
-      }
+        }
+        seen.add(threadId);
+        console.log(seen);
     }
     
-    const staleThreadsList = Object.values(lastPerThread);
+    const staleThreadsList = Object.values(threadStates);
     console.log(`📤 ${staleThreadsList.length} follow-ups queued`);
     
     // In follow-up job, REPLACE nudge logic:
     for (const thread of staleThreadsList) {
         // 1. Load thread history
-        const history = await getThreadHistory(thread.businessId, thread.threadId);
+        const history = await getThreadHistory(thread.businessId, thread.threadId, thread.sessionId);
         
         // 2. Get business config
         const business = await getBusinessConfig(thread.businessId);
@@ -52,10 +65,12 @@ export function startFollowUpJob() {
         const nudgeMsg = await generateFollowUp(history, business);
   
         // 4. Send via channel
-        const success = await senders[thread.channel]?.send(thread.threadId, nudgeMsg);
+        const success = await senders[thread.channel]?.(thread.threadId, nudgeMsg);
   
         if (success) {
             await markFollowUpSent(sheets, thread.rowIndex);
+            // 🚀 PUSH TO Route (real-time!)
+            io.to(thread.threadId).emit('nudge', { message: nudgeMsg });
             console.log(`✅ AI nudge sent: ${thread.channel}/${thread.threadId}`);
   }
 }
@@ -68,6 +83,7 @@ async function markFollowUpSent(sheets, rowIndex) {
     spreadsheetId: SHEET_ID,
     range: `${MESSAGES_TAB}!G${rowIndex + 1}`,  // +1 for 1-based rows
     valueInputOption: 'USER_ENTERED',
-    resource: { values: [['true']] }
+    resource: { values: [['TRUE']] }
   });
 }
+

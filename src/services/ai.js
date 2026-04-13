@@ -4,7 +4,8 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(${{secrets.GEMINI_API_KEY}});
+const genAI = new GoogleGenerativeAI('AIzaSyD6BFWNQV0y7gDhSDTXm4hC3ob3mMqcBP8');
+
 
 /**
  * Safely extract JSON from a Gemini response.
@@ -44,7 +45,6 @@ function formatHistory(historyRows) {
  */
 export async function generateReply({ business, history, userMessage }) {
   const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
-
   const conversationHistory = formatHistory(history);
   console.log("CONVERSATION HISTORY: " + conversationHistory);
 
@@ -178,7 +178,7 @@ ${userMessage}
 
 // AI-personalized follow-up
 export async function generateFollowUp(history, business) {
-  const model = genAI.getGenerativeModel('gemini-3.1-flash-lite-preview');
+  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
   const historySummary = history.slice(-5).map(row => `${row[2]}: ${row[3]}`).join('\n');
   
   const prompt = `Generate a short, personalized follow-up nudge based on this conversation:
