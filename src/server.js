@@ -49,12 +49,6 @@ app.use("/webhook/widget", widgetRoutes);
 // Telegram Webhook
 app.use('/webhook/telegram', telegramRoutes);
 
-// Catch-all for debugging  
-app.use('*', (req, res) => {
-  console.log('❌ 404:', req.method, req.path);
-  res.status(404).send('Not found');
-});
-
 // Simple health check so you can confirm the backend is alive.
 app.get("/health", (req, res) => {
   res.json({ ok: true });
@@ -82,6 +76,11 @@ io.on('connection', (socket) => {
 // Export io for followups
 export { io };
 
+// Catch-all for debugging  
+app.use('*', (req, res) => {
+  console.log('❌ 404:', req.method, req.path);
+  res.status(404).send('Not found');
+});
 
 startFollowUpJob();  // 🔥 Starts cron
 
