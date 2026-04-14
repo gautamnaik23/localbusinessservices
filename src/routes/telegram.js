@@ -15,7 +15,6 @@ router.post('/webhook', async (req, res) => {  // Try this too
 });
 
 export default router;
-<<<<<<< HEAD
 /*
 // src/routes/telegram.js - Receives Telegram webhook updates
 import Router from 'express';
@@ -148,5 +147,3 @@ router.post('/test-business', async (req, res) => {
 
 export default router;
 */
-=======
->>>>>>> refs/remotes/origin/main
