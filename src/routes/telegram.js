@@ -11,6 +11,7 @@ const router = Router();
 
 router.post('/', async (req, res) => {
   try {
+    console.log("executing telegram.js")
     const update = req.body;
     
     // Telegram webhook payload
@@ -68,6 +69,7 @@ router.post('/', async (req, res) => {
 
 router.post('/test', async (req, res) => {  // Your test route
   try {
+    console.log("executing test in telegram.js")
     const { chatId, message } = req.body;
     //const update = req.body;
     //const businessid = update.message?.text.split(' ')[1];
@@ -90,6 +92,7 @@ router.post('/test', async (req, res) => {  // Your test route
 
 // Test businessid parsing
 router.post('/test-business', async (req, res) => {
+  console.log("executing test number 2 in telegram.js")
   try {
     const { chatId, text } = req.body;
     console.log(`🧪 Test text: ${text} chatId: ${chatId}`);
