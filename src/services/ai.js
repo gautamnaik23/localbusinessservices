@@ -52,7 +52,7 @@ function formatHistory(historyRows) {
  */
 export async function generateReply({ business, history, userMessage }) {
   const model = genAI.getGenerativeModel({ model: "gemma-3-1b-it" });
-  consolee.log("model created");
+  console.log("model created");
   const conversationHistory = formatHistory(history);
   console.log("CONVERSATION HISTORY: " + conversationHistory);
 
