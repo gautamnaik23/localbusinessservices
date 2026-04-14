@@ -69,6 +69,7 @@ ${conversationHistory || "No previous conversation history."}
 ---
 
 Business Information:
+Business Name: ${business.businessName || ""}
 Booking Link: ${business.bookingLink || ""}
 Office Number: ${business.officeNumber || ""}
 FAQs: ${business.faqs || ""}
