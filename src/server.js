@@ -1,3 +1,21 @@
+import express from 'express';
+import cors from 'cors';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.post('/webhook/telegram', (req, res) => {
+  console.log('✅ DIRECT ROUTE HIT');
+  console.log('Body:', req.body);
+  res.json({ ok: true });
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('🚀 Minimal server live');
+});
+
+/*
 // src/server.js
 // Main entry point for the backend.
 // This file creates the Express app, sets up middleware,
