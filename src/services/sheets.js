@@ -131,3 +131,51 @@ export async function saveAppointment(threadId, appointmentTime, reminder24h, re
   console.log(`Saved appointment for business ${businessId}`);
   return true;
 }
+
+// THREAD MAPPING - chatId → businessid persistence
+const THREAD_CONFIG = {
+  tabName: 'TIDtoBID',  // New tab: A=chatId, B=businessid, C=firstSeen
+  cols: {
+    chatId: 0,        // A
+    businessid: 1,    // B
+    firstSeen: 2      // C
+  }
+};
+
+// Save chatId → businessid mapping (called on /start)
+export async function saveThreadMapping(chatId, businessid) {
+  const sheets = await getSheetsClient();
+  
+  const newRow = [
+    chatId,                                    // A
+    businessid,                                // B
+    new Date().toISOString().slice(0, 10)      // C: YYYY-MM-DD
+  ];
+  
+  const range = `${THREAD_CONFIG.tabName}!A:C`;
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM',
+    range,
+    valueInputOption: 'RAW',
+    insertDataOption: 'INSERT_ROWS',
+    resource: { values: [newRow] }
+  });
+  
+  console.log(`🔗 Saved mapping: ${chatId} → ${businessid}`);
+}
+
+// Lookup businessid by chatId
+export async function getThreadBusiness(chatId) {
+  const sheets = await getSheetsClient();
+  
+  const range = `${THREAD_CONFIG.tabName}!A:C`;
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM',
+    range
+  });
+  
+  const rows = res.data.values?.slice(1) || [];  // Skip header
+  
+  const match = rows.find(row => row[THREAD_CONFIG.cols.chatId] == chatId);
+  return match ? match[THREAD_CONFIG.cols.businessid] : null;
+}

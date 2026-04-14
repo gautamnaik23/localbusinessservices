@@ -5,6 +5,7 @@
 
 import './services/scheduler.js';  // 🔥 Starts crons
 import dotenv from "dotenv";
+import telegramRoutes from './routes/telegram.js';
 dotenv.config();
 
 
@@ -43,6 +44,9 @@ app.get("/health", (req, res) => {
 
 // Register the widget webhook route.
 app.use("/webhook/widget", widgetRoutes);
+
+// Telegram Webhook
+app.use('/webhook/telegram', telegramRoutes);
 
 // Default homepage response.
 app.get("/", (req, res) => {

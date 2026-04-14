@@ -39,6 +39,7 @@ export async function checkAllReminders() {
     const apptDateStr = row[CONFIG.cols.apptDate];
     const apptTime = row[CONFIG.cols.apptTime];
     const threadId = row[CONFIG.cols.threadId];
+    const channel = row[CONFIG.cols.channel];
     
     const apptDate = parseDate(apptDateStr);
     if (!apptDate || isNaN(apptDate)) continue;
@@ -52,32 +53,36 @@ export async function checkAllReminders() {
     
     const diffMs = fullAppt - now;
     
-    // 24h reminder
-    const sent24h = row[CONFIG.cols.reminder24h] === 'TRUE';
-    if (!sent24h && diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000) {
-      await sendNudge(threadId, {
-        message: 'Hi! Just a reminder that you have an appointment scheduled for ${apptTime}. Let us know if you need to reschedule!'
-      }, CONFIG.cols.channel);
-      await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);  // Pass rowIdx
-      console.log(`✅ 24h reminder → ${threadId}`);
-    }
-    
+
     // 2h reminder
     const sent2h = row[CONFIG.cols.reminder2h] === 'TRUE';
     if (!sent2h && diffMs > 0 && diffMs <= 2 * 60 * 60 * 1000) {
+      console.log("sending 2hr reminder for " + apptDateStr + " " + apptTime);
       await sendNudge(threadId, {
-        message: 'Just a quick reminder — your appointment at ${apptTime} is coming up soon. See you shortly 😊'
-      }, CONFIG.cols.channel);
+        message: 'Just a quick reminder — your appointment today at ' + apptTime +  ' is coming up soon. See you shortly 😊'
+      }, channel);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder2h);
-      console.log(`✅ 2h reminder → ${threadId}`);
+      await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);
+      continue
     }
+
+    // 24h reminder
+    const sent24h = row[CONFIG.cols.reminder24h] === 'TRUE';
+    if (!sent24h && diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000) {
+      console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime);
+      await sendNudge(threadId, {
+        message: 'Hi! Just a reminder that you have an appointment scheduled for ' + apptTime + ' on ' + apptDateStr + ' . Let us know if you need to reschedule!'
+      }, channel);
+      await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);  // Pass rowIdx
+    }
+    
   }
 }
 
 async function markSent(sheets, rowIdx, colIndex) {
   const range = `${CONFIG.tabName}!${String.fromCharCode(65 + colIndex)}${rowIdx + 2}`;  // +2 = header + 1-index
   await sheets.spreadsheets.values.update({
-    spreadsheetId: process.env.GOOGLESHEETID,
+    spreadsheetId: '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM',
     range,
     valueInputOption: 'RAW',
     resource: { values: [['TRUE']] }

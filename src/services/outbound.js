@@ -10,7 +10,7 @@ export const senders = {
   telegram: async (chatId, message) => {
     // Telegram Bot API
     const token = '8644746859:AAG6Kbo1l_gIbrh-sPfnK2u_zeFMiKW7fZ0';
-    await fetch(`https://api.telegram.org/bot$8644746859:AAG6Kbo1l_gIbrh-sPfnK2u_zeFMiKW7fZ0/sendMessage`, {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text: message })

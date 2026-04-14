@@ -2,6 +2,7 @@
 import cron from 'node-cron';
 import { io } from '../server.js';  // Your socket.io instance
 import checkAllReminders from '../services/reminders.js';
+import { senders } from './outbound.js';
 //import checkReviews from './services/reviews.js';  // Later
 
 
@@ -12,7 +13,7 @@ export async function sendNudge(threadId, data, channel) {
       break;
     case 'telegram':
       // Telegram API call
-      await sendTelegramMessage(threadId, data.message);
+      await senders.telegram(threadId, data.message);
       break;
     case 'sms':
       // SMS API (Twilio)
