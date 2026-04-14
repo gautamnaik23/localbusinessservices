@@ -3,9 +3,7 @@
 // This file creates the Express app, sets up middleware,
 // serves static files, and registers webhook routes.
 
-import './services/scheduler.js';  // 🔥 Starts crons
 import dotenv from "dotenv";
-import telegramRoutes from './routes/telegram.js';
 dotenv.config();
 
 
@@ -16,6 +14,7 @@ import { fileURLToPath } from "url";
 import { createServer } from "http";           // ✅ HTTP server
 import { Server } from "socket.io";            // ✅ WebSockets
 
+import telegramRoutes from './routes/telegram.js';
 import widgetRoutes from "./routes/widget.js";
 import { startFollowUpJob } from './jobs/followups.js';
 
@@ -87,9 +86,8 @@ app.use('*', (req, res) => {
 
 startFollowUpJob();  // 🔥 Starts cron
 
-import './services/scheduler.js';  // 🔥 Starts crons
-
 // Start the server.
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server + WebSockets on port ${PORT}`);
+  import './services/scheduler.js';  // 🔥 Starts crons
 });
