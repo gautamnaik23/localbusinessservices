@@ -1,4 +1,4 @@
-import Router from 'express';
+/*import Router from 'express';
 const router = Router();
 console.log("reached telegram.js");
 
@@ -9,13 +9,13 @@ router.post('/', async (req, res) => {
   res.json({ ok: true, hit: true });
 });
 
-/*router.post('/webhook', async (req, res) => {  // Try this too
+router.post('/webhook', async (req, res) => {  // Try this too
   console.log('✅ ROUTER POST /webhook HIT');
   res.json({ ok: true });
-});*/
+});
 
-export default router;
-/*
+export default router;*/
+
 // src/routes/telegram.js - Receives Telegram webhook updates
 import Router from 'express';
 import { saveMessagesBatch } from '../services/messages.js';
@@ -86,7 +86,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/test', async (req, res) => {  // Your test route
+/*router.post('/test', async (req, res) => {  // Your test route
   try {
     console.log("executing test in telegram.js")
     const { chatId, message } = req.body;
@@ -143,7 +143,7 @@ router.post('/test-business', async (req, res) => {
     console.error('Test-business error:', err);
     res.status(500).json({ error: err.message });
   }
-});
+});*/
 
 export default router;
-*/
+
