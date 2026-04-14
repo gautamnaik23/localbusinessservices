@@ -47,7 +47,10 @@ app.use("/public", express.static(path.join(__dirname, "..", "public")));
 app.use("/webhook/widget", widgetRoutes);
 
 // Telegram Webhook
-app.use('/webhook/telegram', telegramRoutes);
+app.use('/webhook/telegram', (req, res, next) => {
+  console.log('REAL TELEGRAM HIT:', JSON.stringify(req.body).slice(0, 200)); 
+  telegramRoutes;
+});
 
 // Simple health check so you can confirm the backend is alive.
 app.get("/health", (req, res) => {
