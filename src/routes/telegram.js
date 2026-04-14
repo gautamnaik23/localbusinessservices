@@ -8,6 +8,7 @@ import { generateSessionId } from "../utils/ids.js";
 import { getThreadBusiness, saveThreadMapping} from '../services/sheets.js';
 
 const router = Router();
+console.log("entered telegram.js");
 
 router.post('/', async (req, res) => {
   try {
