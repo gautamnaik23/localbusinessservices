@@ -3,7 +3,7 @@ import cron from 'node-cron';
 import { io } from '../server.js';  // Your socket.io instance
 import checkAllReminders from '../services/reminders.js';
 import { senders } from './outbound.js';
-//import checkReviews from './services/reviews.js';  // Later
+import checkAllReviews from './reviews.js';
 
 
 export async function sendNudge(threadId, data, channel) {
@@ -25,16 +25,15 @@ export async function sendNudge(threadId, data, channel) {
   console.log(`📱 ${channel} nudge → ${threadId}`);
 }
 
-// Every 2h
-cron.schedule('* * * * *', () => {
+// Every 1 minute
+cron.schedule('*/10 * * * *', () => {
   console.log('🕐 Running reminders...');
   checkAllReminders();
 });
 
-// Every day at 6PM (post-appt reviews)
-//cron.schedule('0 18 * * *', () => {
-//  console.log('⭐ Running reviews...');
-//  checkReviews();
-//});
+//Sending out Review Requests
+cron.schedule('0 * * * *', () => {
+  checkAllReviews();
+});
 
 export default null;  // Just runs

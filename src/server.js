@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
 export { io };
 
 
-startFollowUpJob();  // 🔥 Starts cron
+//startFollowUpJob();  // 🔥 Starts cron
 
 // Start the server.
 httpServer.listen(PORT, () => {

@@ -14,7 +14,8 @@ const BUSINESS_SHEET_CONFIG = {
   bookingLinkColumn: 3,         // Column D
   faqsColumn: 4,  // Column E (FAQs as comma-separated or JSON)
   promotionsColumn: 5,          // Column F (promotions/offers)
-  businessWebsiteColumn: 6
+  businessWebsiteColumn: 6,
+  businessReviewLink: 7
 };
 
 /**
@@ -60,6 +61,7 @@ export async function getBusinessConfig(businessId) {
     officeNumber: businessRow[BUSINESS_SHEET_CONFIG.officeNumberColumn] || '',
     faqs: businessRow[BUSINESS_SHEET_CONFIG.faqsColumn] || '',  // e.g., "Service A: info, Service B: info"
     promotions: businessRow[BUSINESS_SHEET_CONFIG.promotionsColumn] || '', // e.g., "10% off first visit"
-    website: businessRow[BUSINESS_SHEET_CONFIG.businessWebsiteColumn] || ''  // Col M (optional)
+    website: businessRow[BUSINESS_SHEET_CONFIG.businessWebsiteColumn] || '',  // Col M (optional)
+    reviewLink: businessRow[BUSINESS_SHEET_CONFIG.businessReviewLink] || ''
   };
 }

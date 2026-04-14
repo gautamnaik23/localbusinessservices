@@ -35,7 +35,7 @@ export function startFollowUpJob() {
         const followUp = row[6] === 'FALSE';
         const hoursSilence = (now - new Date(row[4])) / (1000 * 60 * 60);
     
-        if (replyNeeded && followUp && hoursSilence > 0.02) {
+        if (replyNeeded && followUp && hoursSilence > 0.1) {
             threadStates[threadId] = {
               threadId, 
               businessId: row[7], 
