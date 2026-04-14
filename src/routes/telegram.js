@@ -39,8 +39,8 @@ router.post('/', async (req, res) => {
     // Telegram sends: /start demobusiness. Use this to parse out id
     // Get businessid from /start OR lookup by chatId
     let businessid;
-    if (text?.startsWith('/start ')) {
-        businessid = text.split(' ')[1];
+    if (userMessage?.startsWith('/start ')) {
+        businessid = userMessage.split(' ')[1];
         await saveThreadMapping(chatId, businessid);  // Save once
     } else {
         businessid = await getThreadBusiness(chatId);  // Lookup
