@@ -4,7 +4,14 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI('AIzaSyDg_5l9jec53xiSES9D0Vh9FzpbfFfHg8g');
+import dotenv from 'dotenv';
+dotenv.config();
+
+const sec = process.env.GEMINI_API_KEY;  // Render env var
+if (!sec) throw new Error('❌ GEMINI_API_KEY missing');
+
+const genAI = new GoogleGenerativeAI(sec);
+console.log('✅ Gemini initialized');
 
 
 /**
