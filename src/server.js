@@ -13,7 +13,7 @@ router.post('/', (req, res) => {
   res.json({ ok: true });
 });
 import telegramRoutes from './routes/telegram.js';  // ✅ .js extension
-console.log('✅ telegram imported:', !!testRouter);
+console.log('✅ telegram imported:', !!telegramRoutes);
 
 app.use('/webhook/telegram', telegramRoutes);
 
