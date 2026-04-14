@@ -54,9 +54,6 @@ router.post('/', async (req, res) => {
 
     console.log(`📱 Telegram: ${chatId}: ${userMessage.slice(0, 50)}`);
 
-    // Save incoming message
-    await saveMessagesBatch(businessid, chatId.toString(), [{role: 'user', text: userMessage, replyNeeded: false, followUp: false}], 'telegram');
-
     // 1. Load business config FIRST
     const business = await getBusinessConfig(businessid);
 
@@ -118,7 +115,7 @@ router.post('/test-business', async (req, res) => {
     
     // Simulate parsing
     let businessid;
-    if (text?.startsWith('/start ')) {
+    if (text?.startsWi  ('/start ')) {
         businessid = text.split(' ')[1];
         await saveThreadMapping(chatId, businessid);  // Save once
     } else {
