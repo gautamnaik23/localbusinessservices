@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI('AIzaSyDg_5l9jec53xiSES9D0Vh9FzpbfFfHg8g');
 
 
 /**
@@ -45,6 +45,7 @@ function formatHistory(historyRows) {
  */
 export async function generateReply({ business, history, userMessage }) {
   const model = genAI.getGenerativeModel({ model: "gemma-3-1b-it" });
+  consolee.log("model created");
   const conversationHistory = formatHistory(history);
   console.log("CONVERSATION HISTORY: " + conversationHistory);
 
