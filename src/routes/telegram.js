@@ -9,7 +9,7 @@ import { getThreadBusiness, saveThreadMapping} from '../services/sheets.js';
 
 const router = Router();
 
-router.post('/webhook', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const update = req.body;
     
