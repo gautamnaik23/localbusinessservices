@@ -5,11 +5,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post('/webhook/telegram', (req, res) => {
-  console.log('✅ DIRECT ROUTE HIT');
+const router = express.Router();
+
+router.post('/', (req, res) => {
+  console.log('✅ ROUTER HIT');
   console.log('Body:', req.body);
   res.json({ ok: true });
 });
+app.use('/webhook/telegram', router);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('🚀 Minimal server live');
