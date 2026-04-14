@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
     console.log(`📱 Telegram: ${chatId}: ${userMessage.slice(0, 50)}`);
 
     // Save incoming message
-    await saveMessagesBatch(businessid, chatId.toString(), {role: 'user', text: userMessage, replyNeeded: false, followUp: false}, 'telegram', userMessage);
+    await saveMessagesBatch(businessid, chatId.toString(), {role: 'user', text: userMessage, replyNeeded: false, followUp: false}, 'telegram');
 
     // 1. Load business config FIRST
     const business = await getBusinessConfig(businessid);
