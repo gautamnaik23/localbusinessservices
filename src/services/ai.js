@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI('AIzaSyD6BFWNQV0y7gDhSDTXm4hC3ob3mMqcBP8');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 
 /**
