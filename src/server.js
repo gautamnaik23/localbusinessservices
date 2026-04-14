@@ -34,6 +34,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//making sure it's correct
+app.use('/webhook/telegram', (req, res, next) => {
+  console.log('🔍 TELEGRAM HIT:', JSON.stringify(req.body).slice(0, 200));
+  next();  // Pass to real route
+});
+
 // Serve files from the public folder, like widget.html, widget.js, and widget.css.
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
@@ -42,6 +48,12 @@ app.use("/webhook/widget", widgetRoutes);
 
 // Telegram Webhook
 app.use('/webhook/telegram', telegramRoutes);
+
+// Catch-all for debugging  
+app.use('*', (req, res) => {
+  console.log('❌ 404:', req.method, req.path);
+  res.status(404).send('Not found');
+});
 
 // Simple health check so you can confirm the backend is alive.
 app.get("/health", (req, res) => {
