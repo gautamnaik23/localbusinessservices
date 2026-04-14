@@ -4,7 +4,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const sec = ${{ secrets.GEMINI_API_KEY }}
+const sec = ${ secrets.GEMINI_API_KEY }
 const genAI = new GoogleGenerativeAI(sec);
 
 
