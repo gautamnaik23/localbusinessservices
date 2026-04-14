@@ -18,7 +18,7 @@ export default router;*/
 
 // src/routes/telegram.js - Receives Telegram webhook updates
 import Router from 'express';
-import { saveMessagesBatch } from '../services/messages.js';
+import { saveMessagesBatch, getThreadHistory } from '../services/messages.js';
 import { getBusinessConfig } from '../services/business.js';
 import { generateReply } from '../services/ai.js';
 import { senders } from '../services/outbound.js';
