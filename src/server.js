@@ -89,5 +89,5 @@ startFollowUpJob();  // 🔥 Starts cron
 // Start the server.
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server + WebSockets on port ${PORT}`);
-  import './services/scheduler.js';  // 🔥 Starts crons
+  import('./services/scheduler.js');
 });
