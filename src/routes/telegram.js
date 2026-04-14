@@ -9,10 +9,10 @@ router.post('/', async (req, res) => {
   res.json({ ok: true, hit: true });
 });
 
-router.post('/webhook', async (req, res) => {  // Try this too
+/*router.post('/webhook', async (req, res) => {  // Try this too
   console.log('✅ ROUTER POST /webhook HIT');
   res.json({ ok: true });
-});
+});*/
 
 export default router;
 /*

@@ -12,10 +12,10 @@ router.post('/', (req, res) => {
   console.log('Body:', req.body);
   res.json({ ok: true });
 });
-import testRouter from './routes/test-router.js';  // ✅ .js extension
-console.log('✅ testRouter imported:', !!testRouter);
+import telegramRoutes from './routes/telegram.js';  // ✅ .js extension
+console.log('✅ telegram imported:', !!testRouter);
 
-app.use('/webhook/telegram', testRouter);
+app.use('/webhook/telegram', telegramRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('🚀 Minimal server live');
