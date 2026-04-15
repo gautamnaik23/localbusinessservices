@@ -56,7 +56,7 @@ export async function getBusinessConfig(businessId) {
   // Map Sheet columns to clean AI prompt fields (exact names your prompt expects)
   return {
     businessId,
-    businessName: businessRow[BUSINESS_SHEET_CONFIG.bookingNameColumn] || 'Unnamed Business',  // Col A
+    businessName: businessRow[BUSINESS_SHEET_CONFIG.businessNameColumn] || 'Unnamed Business',  // Col A
     bookingLink: businessRow[BUSINESS_SHEET_CONFIG.bookingLinkColumn] || '',
     officeNumber: businessRow[BUSINESS_SHEET_CONFIG.officeNumberColumn] || '',
     faqs: businessRow[BUSINESS_SHEET_CONFIG.faqsColumn] || '',  // e.g., "Service A: info, Service B: info"
