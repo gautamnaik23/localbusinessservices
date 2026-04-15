@@ -1,11 +1,69 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
+import path from "path";
+import { fileURLToPath } from "url";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
+
+import telegramRoutes from './routes/telegram.js'; 
+import widgetRoutes from "./routes/widget.js";
+import { startFollowUpJob } from "./jobs/followups.js";
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const router = express.Router();
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
+
+app.use("/webhook/widget", widgetRoutes);
+app.use("/webhook/telegram", telegramRoutes);
+
+app.get("/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+app.get("/", (req, res) => {
+  res.send("AI receptionist backend is running.");
+});
+
+app.use("*", (req, res) => {
+  console.log("❌ 404:", req.method, req.path);
+  res.status(404).send("Not found");
+});
+
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: { origin: "*" }
+});
+
+io.on("connection", (socket) => {
+  console.log("✅ Widget connected:", socket.id);
+  socket.on("join-thread", (threadId) => {
+    socket.join(threadId);
+    console.log(`Widget joined: ${threadId}`);
+  });
+});
+
+export { io };
+
+startFollowUpJob();
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server + WebSockets on port ${PORT}`);
+  import("./services/scheduler.js");
+});
+
+/*const router = express.Router();
 
 router.post('/', (req, res) => {
   console.log('✅ ROUTER HIT');
@@ -19,16 +77,13 @@ app.use('/webhook/telegram', telegramRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('🚀 Minimal server live');
-});
+});*/
 
 /*
 // src/server.js
 // Main entry point for the backend.
 // This file creates the Express app, sets up middleware,
 // serves static files, and registers webhook routes.
-
-import dotenv from "dotenv";
-dotenv.config();
 
 
 import express from "express";
