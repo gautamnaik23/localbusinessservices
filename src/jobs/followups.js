@@ -29,6 +29,9 @@ export function startFollowUpJob() {
     const seen = new Set();
     for (const row of rows.slice().reverse()) {  // Newest first
       const threadId = row[0];
+      if (threadId == "") {
+        continue;
+      }
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
