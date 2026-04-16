@@ -4,6 +4,7 @@
 
 import { getSheetsClient } from './sheets.js';
 import { sendNudge } from './scheduler.js';  // From scheduler.js
+import { DateTime } from 'luxon';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',
@@ -28,7 +29,7 @@ export async function checkAllReminders() {
   });
   
   const rows = res.data.values?.slice(1) || [];  // Skip header
-  const now = new Date();
+  const now = DateTime.now().setZone('America/Los_Angeles');
   
   console.log(`📅 Checking ${rows.length} appts...`);
   
@@ -40,25 +41,33 @@ export async function checkAllReminders() {
     const apptTime = row[CONFIG.cols.apptTime];
     const threadId = row[CONFIG.cols.threadId];
     const channel = row[CONFIG.cols.channel];
-    
-    const apptDate = parseDate(apptDateStr);
-    if (!apptDate || isNaN(apptDate)) continue;
-    
-    const fullAppt = new Date(apptDate);
+
+    // 1️⃣ Parse date + time (handles AM/PM automatically!)
+    const apptDate = DateTime.fromFormat(
+    `${apptDateStr} ${apptTime}`, 
+    'ccc LLL dd yyyy h:mm a',  // ← Handles "Thu Apr 16 2026 4:00 PM"
+    { zone: 'America/Los_Angeles' }  // Your local timezone
+    );
+
+    // 3️⃣ Calculate difference
+    const diffHours = apptDate.diff(now, 'hours').hours;
+
+
+/*    const fullAppt = new Date(apptDate);
     fullAppt.setHours(
       parseInt(apptTime.split(':')[0]),
       parseInt(apptTime.split(':')[1].slice(0, 2)),
       0, 0
     );
     
-    const diffMs = fullAppt - now;
-    const hoursSilence = diffMs / 60 / 60 / 1000
-    console.log(apptDate + ": " + apptTime + " is " + diffMs / (60 * 60 * 1000) + " away." );
-    console.log(hoursSilence);
+    const diffMs = fullAppt - now;*/
+    console.log(apptDate + ": " + apptTime + " is " + diffHours + " away." );
+    const twoHours = 2 * 60 * 60 * 1000;
+    const twofourHours = 24 * 60 * 60 * 1000;
 
     // 2h reminder
     const sent2h = row[CONFIG.cols.reminder2h] === 'TRUE';
-    if (!sent2h && diffMs > 0 && diffMs <= 2 * 60 * 60 * 1000) {
+    if (!sent2h && diffMs > 0 && diffMs <= 2) {
       console.log("sending 2hr reminder for " + apptDateStr + " " + apptTime);
       await sendNudge(threadId, {
         message: 'Just a quick reminder — your appointment today at ' + apptTime +  ' is coming up soon. See you shortly 😊'
@@ -70,7 +79,7 @@ export async function checkAllReminders() {
 
     // 24h reminder
     const sent24h = row[CONFIG.cols.reminder24h] === 'TRUE';
-    if (!sent24h && diffMs > 2 && diffMs <= 24 * 60 * 60 * 1000) {
+    if (!sent24h && diffMs > 2 && diffMs <= 24) {
       console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime + "    " + diffMs);
       await sendNudge(threadId, {
         message: 'Hi! Just a reminder that you have an appointment scheduled for ' + apptTime + ' on ' + apptDateStr + ' . Let us know if you need to reschedule!'
