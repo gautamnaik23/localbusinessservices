@@ -41,11 +41,31 @@ export async function checkAllReminders() {
     const apptTime = row[CONFIG.cols.apptTime];
     const threadId = row[CONFIG.cols.threadId];
     const channel = row[CONFIG.cols.channel];
+    
+    // 1️⃣ Parse MM/DD/YYYY date
+    const dateParts = apptDateStr.split('/');  // ["04", "16", "2026"]
+    const year = parseInt(dateParts[2]);
+    const month = parseInt(dateParts[0]);
+    const day = parseInt(dateParts[1]);
+
+    // 2️⃣ Parse 1:00 AM time
+    const timeMatch = apptTime.match(/(\d+):(\d{2})\s*(AM|PM)?/i);
+    
+    const [, hourStr, minStr, ampm] = timeMatch;
+    let hour24 = parseInt(hourStr);
+    const mins = parseInt(minStr);
+
+    if (ampm?.toUpperCase() === 'PM' && hour24 < 12) hour24 += 12;
+    if (ampm?.toUpperCase() === 'AM' && hour24 === 12) hour24 = 0;
 
     // 1️⃣ Parse date + time (handles AM/PM automatically!)
-    const apptDate = DateTime.fromFormat(
-    `${apptDateStr} ${apptTime}`, 
-    'ccc LLL dd yyyy h:mm a',  // ← Handles "Thu Apr 16 2026 4:00 PM"
+    const apptDate = DateTime.fromObject(
+      { 
+    year, month, day, 
+    hour: hour24, 
+    minute: mins, 
+    second: 0 
+    },
     { zone: 'America/Los_Angeles' }  // Your local timezone
     );
 
