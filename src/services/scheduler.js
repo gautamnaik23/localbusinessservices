@@ -33,7 +33,7 @@ cron.schedule('* * * * *', () => {
 });
 
 //Sending out Review Requests
-cron.schedule('0 * * * *', () => {
+cron.schedule('* * * * *', () => {
   checkAllReviews();
 });
 
