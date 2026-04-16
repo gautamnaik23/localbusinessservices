@@ -67,7 +67,7 @@ export async function checkAllReminders() {
 
     // 2h reminder
     const sent2h = row[CONFIG.cols.reminder2h] === 'TRUE';
-    if (!sent2h && diffMs > 0 && diffMs <= 2) {
+    if (!sent2h && diffHours > 0 && diffHours <= 2) {
       console.log("sending 2hr reminder for " + apptDateStr + " " + apptTime);
       await sendNudge(threadId, {
         message: 'Just a quick reminder — your appointment today at ' + apptTime +  ' is coming up soon. See you shortly 😊'
@@ -79,7 +79,7 @@ export async function checkAllReminders() {
 
     // 24h reminder
     const sent24h = row[CONFIG.cols.reminder24h] === 'TRUE';
-    if (!sent24h && diffMs > 2 && diffMs <= 24) {
+    if (!sent24h && diffHours > 2 && diffHours <= 24) {
       console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime + "    " + diffMs);
       await sendNudge(threadId, {
         message: 'Hi! Just a reminder that you have an appointment scheduled for ' + apptTime + ' on ' + apptDateStr + ' . Let us know if you need to reschedule!'
