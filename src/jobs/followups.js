@@ -12,7 +12,7 @@ const MESSAGES_TAB = 'Conversation History';
 
 export function startFollowUpJob() {
   cron.schedule('*/10 * * * *', async () => {  // Every 10min for real implementation
-  //cron.schedule('0 */2 * * *', async () => { //every 2 hours
+  //cron.schedule('* * * * *', async () => { //every 1 minute
     console.log('🔔 Checking follow-ups...');
     const sheets = await getSheetsClient();
     

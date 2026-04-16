@@ -1,21 +1,3 @@
-/*import Router from 'express';
-const router = Router();
-console.log("reached telegram.js");
-
-
-router.post('/', async (req, res) => {
-  console.log('✅ ROUTER POST / HIT');
-  console.log('Body:', req.body);
-  res.json({ ok: true, hit: true });
-});
-
-router.post('/webhook', async (req, res) => {  // Try this too
-  console.log('✅ ROUTER POST /webhook HIT');
-  res.json({ ok: true });
-});
-
-export default router;*/
-
 // src/routes/telegram.js - Receives Telegram webhook updates
 import Router from 'express';
 import { saveMessagesBatch, getThreadHistory } from '../services/messages.js';
@@ -82,65 +64,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-/*router.post('/test', async (req, res) => {  // Your test route
-  try {
-    console.log("executing test in telegram.js")
-    const { chatId, message } = req.body;
-    //const update = req.body;
-    //const businessid = update.message?.text.split(' ')[1];
-    console.log(`🧪 TEST SEND: ${chatId} → ${message}`);  // ADD
-    
-    await senders.send('telegram', chatId, message);
-    
-    // Test sheet write
-    await saveMessagesBatch('demo_business2', chatId.toString(), [
-    {role: 'ai', text: message, replyNeeded: true, followUp: false}
-    ], 'telegram');
-    console.log('✅ Sheet updated');  // ADD
-    
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Test error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Test businessid parsing
-router.post('/test-business', async (req, res) => {
-  console.log("executing test number 2 in telegram.js")
-  try {
-    const { chatId, text } = req.body;
-    console.log(`🧪 Test text: ${text} chatId: ${chatId}`);
-    
-    // Simulate parsing
-    let businessid;
-    if (text?.startsWi  ('/start ')) {
-        businessid = text.split(' ')[1];
-        await saveThreadMapping(chatId, businessid);  // Save once
-    } else {
-        businessid = await getThreadBusiness(chatId);  // Lookup
-        if (!businessid) businessid = 'demo_business';  // Fallback
-        }
-    console.log(`🧑‍💼 Parsed businessid: "${businessid}"`);
-    
-    // Test sheet mapping
-    const lookup = await getThreadBusiness(chatId);
-    await saveMessagesBatch(businessid, chatId.toString(), [
-    {role: 'ai', text: text, replyNeeded: true, followUp: false}
-    ], 'telegram');
-    
-    res.json({ 
-      input: text,
-      parsed: businessid,
-      lookup: lookup,
-      saved: true 
-    });
-  } catch (err) {
-    console.error('Test-business error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});*/
 
 export default router;
 

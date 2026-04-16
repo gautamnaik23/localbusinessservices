@@ -52,6 +52,7 @@ export async function checkAllReminders() {
     );
     
     const diffMs = fullAppt - now;
+    console.log(apptDate + ": " + apptTime + " is " + diffMs / (60 * 60 * 1000) + " away." );
     
 
     // 2h reminder
