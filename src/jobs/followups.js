@@ -34,7 +34,8 @@ export function startFollowUpJob() {
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
-        const hoursSilence = (now - new Date(row[4])) / (1000 * 60 * 60);
+        const [datePart, timePart] = row[4].split(' ');
+        const hoursSilence = generateHourDifference(datePart, timePart);
     
         if (replyNeeded && followUp && hoursSilence > 0.1) {
             threadStates[threadId] = {
