@@ -4,7 +4,7 @@
 
 import { getSheetsClient } from './sheets.js';
 import { sendNudge } from './scheduler.js';  // From scheduler.js
-import { DateTime } from 'luxon';
+import { generateHourDifference } from '../utils/ids.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',
@@ -29,7 +29,6 @@ export async function checkAllReminders() {
   });
   
   const rows = res.data.values?.slice(1) || [];  // Skip header
-  const now = DateTime.now().setZone('America/Los_Angeles');
   
   console.log(`📅 Checking ${rows.length} appts...`);
   
@@ -42,48 +41,8 @@ export async function checkAllReminders() {
     const threadId = row[CONFIG.cols.threadId];
     const channel = row[CONFIG.cols.channel];
     
-    // 1️⃣ Parse MM/DD/YYYY date
-    const dateParts = apptDateStr.split('/');  // ["04", "16", "2026"]
-    const year = parseInt(dateParts[2]);
-    const month = parseInt(dateParts[0]);
-    const day = parseInt(dateParts[1]);
-
-    // 2️⃣ Parse 1:00 AM time
-    const timeMatch = apptTime.match(/(\d+):(\d{2})\s*(AM|PM)?/i);
-    
-    const [, hourStr, minStr, ampm] = timeMatch;
-    let hour24 = parseInt(hourStr);
-    const mins = parseInt(minStr);
-
-    if (ampm?.toUpperCase() === 'PM' && hour24 < 12) hour24 += 12;
-    if (ampm?.toUpperCase() === 'AM' && hour24 === 12) hour24 = 0;
-
-    // 1️⃣ Parse date + time (handles AM/PM automatically!)
-    const apptDate = DateTime.fromObject(
-      { 
-    year, month, day, 
-    hour: hour24, 
-    minute: mins, 
-    second: 0 
-    },
-    { zone: 'America/Los_Angeles' }  // Your local timezone
-    );
-
-    // 3️⃣ Calculate difference
-    const diffHours = apptDate.diff(now, 'hours').hours;
-
-
-/*    const fullAppt = new Date(apptDate);
-    fullAppt.setHours(
-      parseInt(apptTime.split(':')[0]),
-      parseInt(apptTime.split(':')[1].slice(0, 2)),
-      0, 0
-    );
-    
-    const diffMs = fullAppt - now;*/
-    console.log(apptDate + ": " + apptTime + " is " + diffHours + " away." );
-    const twoHours = 2 * 60 * 60 * 1000;
-    const twofourHours = 24 * 60 * 60 * 1000;
+    // 3Calculate difference
+    const diffHours = generateHourDifference(apptDateStr, apptTime);
 
     // 2h reminder
     const sent2h = row[CONFIG.cols.reminder2h] === 'TRUE';
