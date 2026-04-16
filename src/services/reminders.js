@@ -70,7 +70,7 @@ export async function checkAllReminders() {
     // 24h reminder
     const sent24h = row[CONFIG.cols.reminder24h] === 'TRUE';
     if (!sent24h && diffMs > 2 && diffMs <= 24 * 60 * 60 * 1000) {
-      console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime);
+      console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime + "    " + diffMs);
       await sendNudge(threadId, {
         message: 'Hi! Just a reminder that you have an appointment scheduled for ' + apptTime + ' on ' + apptDateStr + ' . Let us know if you need to reschedule!'
       }, channel);
