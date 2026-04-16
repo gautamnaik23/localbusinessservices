@@ -48,12 +48,13 @@ export function generateHourDifference(apptDateStr, apptTime) {
 export function formatTimestamp() {
   // ✅ CONVERT to America/Los_Angeles (PDT/PST auto)
   const now = DateTime.now().setZone('America/Los_Angeles');
+  const pacificTime = new Date(now.toLocaleString("en-US", { timeZone: 'America/Los_Angeles' }));
   
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const year = now.getFullYear();
-  const hours = now.getHours();
-  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const month = String(pacificTime.getMonth() + 1).padStart(2, '0');
+  const day = String(pacificTime.getDate()).padStart(2, '0');
+  const year = pacificTime.getFullYear();
+  const hours = pacificTime.getHours();
+  const minutes = String(pacificTime.getMinutes()).padStart(2, '0');
   const ampm = hours >= 12 ? 'PM' : 'AM';
   const displayHours = hours % 12 || 12;
   

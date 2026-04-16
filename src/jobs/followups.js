@@ -23,14 +23,12 @@ export function startFollowUpJob() {
     });
     
     const rows = response.data.values || [];
-    const now = new Date();
     
     // Group by threadId → check LATEST replyNeeded/followUp pair
     const threadStates = {};
     const seen = new Set();
     for (const row of rows.slice().reverse()) {  // Newest first
       const threadId = row[0];
-      //console.log(rows.indexOf(row) + ": " + !seen.has(threadId))
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
