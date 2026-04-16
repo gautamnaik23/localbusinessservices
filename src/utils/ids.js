@@ -51,3 +51,16 @@ export function formatTimestamp() {
   
   return now.toFormat('MM/dd/yyyy h:mm a');
 }
+
+export function splitDateTime(fullTimestamp) {
+  if (!fullTimestamp || typeof fullTimestamp !== 'string') {
+    console.log('❌ Invalid timestamp:', fullTimestamp);
+    return { date: '', time: '' };
+  }
+  
+  const parts = fullTimestamp.trim().split(/\s+/);
+  const datePart = parts[0] || '';
+  const timePart = parts.slice(1).join(' ') || '';
+  
+  return { date: datePart, time: timePart };
+}

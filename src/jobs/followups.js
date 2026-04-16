@@ -6,7 +6,7 @@ import { senders } from '../services/outbound.js';  // Router imports all sender
 import { generateFollowUp } from '../services/ai.js';
 import { getThreadHistory } from '../services/messages.js';
 import { getBusinessConfig } from '../services/business.js';
-import { generateHourDifference } from '../utils/ids.js';
+import { generateHourDifference, splitDateTime } from '../utils/ids.js';
 
 const SHEET_ID = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM'
 const MESSAGES_TAB = 'Conversation History';
@@ -29,17 +29,15 @@ export function startFollowUpJob() {
     const seen = new Set();
     for (const row of rows.slice().reverse()) {  // Newest first
       const threadId = row[0];
-      
+      if (threadId == "") {
+        continue;
+      }
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
-        if (!row[4]) {
-        console.log('❌ Missing timestamp at row:', rowIdx);
-        continue;
-        }
-        const [datePart, timePart] = row[4].split(' ');
+        const timedict = splitDateTime(row[4]);
         console.log("This is the datePart:" + datePart + " And this is the time Part: " + timePart + " The original is: " + row[4]);
-        const hoursSilence = generateHourDifference(datePart, timePart);
+        const hoursSilence = generateHourDifference(timedict[0], timedict[1]);
     
         if (replyNeeded && followUp && hoursSilence > 0.1) {
             threadStates[threadId] = {
