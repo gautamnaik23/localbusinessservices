@@ -48,7 +48,7 @@ export async function checkAllReviews() {
     const business = getBusinessConfig(businessId);
 
     // Send review 2h AFTER appointment
-    const hoursSinceAppt = -generateHourDifference(apptDateStr, apptTime); //This figures out now - appTime so looking at negative values
+    const hoursSinceAppt = generateHourDifference(apptDateStr, apptTime); //This figures out now - appTime so looking at negative values
     if (hoursSinceAppt <= -2) {
       const reviewMsg = `Hi! We hope you had a great experience today 😊 If you have a moment, we’d really appreciate it if you could leave us a quick review. It helps us a lot! ${business.reviewLink || ""}`;
       
@@ -71,11 +71,6 @@ async function markReviewSent(sheets, rowIdx, colIndex) {
     valueInputOption: 'RAW',
     resource: { values: [['TRUE']] }
   });
-}
-
-function parseDate(dateStr) {
-  const [month, day, year] = dateStr.split('/');
-  return new Date(year, month - 1, day);
 }
 
 export default checkAllReviews;

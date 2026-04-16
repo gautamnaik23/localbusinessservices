@@ -1,7 +1,7 @@
 // src/services/messages.js
 // Manages conversation history in Google Sheets "Sheet1" tab
 import { getSheetsClient } from './sheets.js';
-import { generateSessionId } from "../utils/ids.js";
+import { formatTimestamp, generateSessionId } from "../utils/ids.js";
 
 const SHEET_ID = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM';
 const MESSAGES_TAB = 'Conversation History';  // Your messages tab
@@ -10,7 +10,7 @@ const MESSAGES_TAB = 'Conversation History';  // Your messages tab
 // Replace saveMessage calls in widget.js with ONE batch:
 export async function saveMessagesBatch(businessId, threadId, messages, channel) {  // messages = [{role, text, replyNeeded, followUp}]
   const sheets = await getSheetsClient();
-  const timestamp = new Date().toISOString();
+  const timestamp = formatTimestamp();
   const sessionId = generateSessionId();
   
   const values = messages.map(msg => [
