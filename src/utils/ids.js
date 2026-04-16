@@ -61,6 +61,6 @@ export function splitDateTime(fullTimestamp) {
   const parts = fullTimestamp.trim().split(/\s+/);
   const datePart = parts[0] || '';
   const timePart = parts.slice(1).join(' ') || '';
-  
+  console.log(datePart, timePart);
   return { date: datePart, time: timePart };
 }
