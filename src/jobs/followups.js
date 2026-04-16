@@ -35,6 +35,7 @@ export function startFollowUpJob() {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
         const [datePart, timePart] = row[4].split(' ');
+        console.log("This is the datePart:" + datePart + " And this is the time Part: " + timePart);
         const hoursSilence = generateHourDifference(datePart, timePart);
     
         if (replyNeeded && followUp && hoursSilence > 0.1) {
