@@ -52,8 +52,9 @@ export async function checkAllReminders() {
     );
     
     const diffMs = fullAppt - now;
+    const hoursSilence = diffMs / 60 / 60 / 1000
     console.log(apptDate + ": " + apptTime + " is " + diffMs / (60 * 60 * 1000) + " away." );
-    
+    console.log(hoursSilence);
 
     // 2h reminder
     const sent2h = row[CONFIG.cols.reminder2h] === 'TRUE';
