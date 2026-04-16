@@ -5,6 +5,7 @@
 import { getSheetsClient } from './sheets.js';
 import { senders } from './outbound.js';
 import { getBusinessConfig } from './business.js';
+import { generateHourDifference } from '../utils/ids.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',  // Same as reminders
@@ -43,20 +44,11 @@ export async function checkAllReviews() {
     const threadId = row[CONFIG.cols.threadId];
     const channel = row[CONFIG.cols.channel];
     
-    const apptDate = parseDate(apptDateStr);
-    if (!apptDate) continue;
-    
-    const fullAppt = new Date(apptDate);
-    fullAppt.setHours(
-      parseInt(apptTime.split(':')[0]) || 0,
-      parseInt(apptTime.split(':')[1]?.slice(0, 2)) || 0,
-      0, 0
-    );
     
     const business = getBusinessConfig(businessId);
 
     // Send review 2h AFTER appointment
-    const hoursSinceAppt = (now - fullAppt) / (1000 * 60 * 60);
+    const hoursSinceAppt = generateHourDifference(apptDateStr, apptTime);
     if (hoursSinceAppt >= 2) {  // 24-48h window
       const reviewMsg = `Hi! We hope you had a great experience today 😊 If you have a moment, we’d really appreciate it if you could leave us a quick review. It helps us a lot! ${business.reviewLink || ""}`;
       

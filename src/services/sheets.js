@@ -59,36 +59,6 @@ export async function getConversationHistory(businessId, threadId, sessionId) {
   });
 }
 
-// Add a new message to the conversation tab
-export async function saveMessage(businessId, threadId, sessionId, messenger, message, replyNeeded, followUp, channel) {
-  const sheets = await getSheetsClient();
-  
-  // Prepare the row data matching your tab structure
-  const newRow = [
-    threadId,           // Column A
-    sessionId,          // Column B  
-    messenger,          // Column C
-    message,            // Column D
-    new Date().toISOString(), // Column E - timestamp
-    replyNeeded,        // Column F
-    followUp,           // Column G
-    businessId,          // Column H
-    channel,
-  ];
-  
-  // Append the row to the conversation tab
-  const range = `${SHEET_CONFIG.conversationTab}`;
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_CONFIG.spreadsheetId,
-    range,
-    valueInputOption: "RAW",
-    insertDataOption: "INSERT_ROWS", // Ensures new rows are added, not overwriting
-    resource: { values: [newRow] }
-  });
-  
-  console.log(`Saved message for business ${businessId}, thread ${threadId} from sheets.js`);
-  return true;
-}
 
 // Read appointments for a business
 export async function getAppointments(businessId) {
