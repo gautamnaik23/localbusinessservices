@@ -48,8 +48,8 @@ export async function checkAllReviews() {
     const business = getBusinessConfig(businessId);
 
     // Send review 2h AFTER appointment
-    const hoursSinceAppt = generateHourDifference(apptDateStr, apptTime);
-    if (hoursSinceAppt >= 2) {  // 24-48h window
+    const hoursSinceAppt = -generateHourDifference(apptDateStr, apptTime); //This figures out now - appTime so looking at negative values
+    if (hoursSinceAppt <= -2) {
       const reviewMsg = `Hi! We hope you had a great experience today 😊 If you have a moment, we’d really appreciate it if you could leave us a quick review. It helps us a lot! ${business.reviewLink || ""}`;
       
       try {
