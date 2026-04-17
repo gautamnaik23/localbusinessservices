@@ -28,6 +28,8 @@ export function startFollowUpJob() {
     const threadStates = {};
     const seen = new Set();
     for (const row of rows.slice().reverse()) {  // Newest first
+      console.log("This is the date/time: " + row[4]);
+      console.log("This is the message: " + row[3]);
       const threadId = row[0];
       if (threadId == "") {
         continue;

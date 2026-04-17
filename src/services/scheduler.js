@@ -25,6 +25,7 @@ export async function sendNudge(threadId, data, channel) {
   console.log(`📱 ${channel} nudge → ${threadId}`);
 }
 
+
 // Every 10 minute
 cron.schedule('* * * * *', () => {
 //cron.schedule('*/10 * * * *', () => {
