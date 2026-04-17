@@ -31,9 +31,6 @@ export function startFollowUpJob() {
       console.log("This is the date/time: " + row[4]);
       console.log("This is the message: " + row[3]);
       const threadId = row[0];
-      if (threadId == "") {
-        continue;
-      }
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
@@ -46,7 +43,7 @@ export function startFollowUpJob() {
         }
         const hoursSilence = generateHourDifference(datePart, timePart);
     
-        if (replyNeeded && followUp && hoursSilence > 0.1) {
+        if (replyNeeded && !followUp && hoursSilence > 0.1) {
             threadStates[threadId] = {
               threadId, 
               businessId: row[7], 
