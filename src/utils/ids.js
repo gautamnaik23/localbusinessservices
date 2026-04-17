@@ -12,6 +12,10 @@ export function generateSessionId() {
 }
 
 export function generateHourDifference(apptDateStr, apptTime) {
+  if (!apptDateStr || !apptTime) {
+    console.log('❌ Missing date or time:', { apptDateStr, apptTime });
+    return null;
+  }
   const now = DateTime.now().setZone('America/Los_Angeles');
 
   // 1️⃣ Parse MM/DD/YYYY date

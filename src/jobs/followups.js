@@ -35,9 +35,13 @@ export function startFollowUpJob() {
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
         const followUp = row[6] === 'FALSE';
-        const timeList = splitDateTime(row[4]);
+        const { datePart, timePart } = splitDateTime(row[4]);
         //console.log("This is the datePart:" + datePart + " And this is the time Part: " + timePart + " The original is: " + row[4]);
-        const hoursSilence = generateHourDifference(timeList[0], timeList[1]);
+        if (!datePart || !timePart) {
+          console.log('❌ Bad timestamp row:', row[4]);
+          continue;
+        }
+        const hoursSilence = generateHourDifference(datePart, timePart);
     
         if (replyNeeded && followUp && hoursSilence > 0.1) {
             threadStates[threadId] = {
