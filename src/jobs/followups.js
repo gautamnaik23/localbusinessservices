@@ -45,7 +45,7 @@ export function startFollowUpJob() {
         console.log("Reached After Date Parsing");
         console.log(replyNeeded, !followUp, hoursSilence);
     
-        if (replyNeeded && !followUp && hoursSilence > 0.1) {
+        if (replyNeeded && followUp && hoursSilence > 0.1) {
             console.log("Added to list");
             threadStates[threadId] = {
               threadId, 
