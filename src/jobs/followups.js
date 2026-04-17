@@ -40,6 +40,7 @@ export function startFollowUpJob() {
         const { datePart, timePart } = splitDateTime(row[4]);
         //console.log("This is the datePart:" + datePart + " And this is the time Part: " + timePart + " The original is: " + row[4]);
         if (!datePart || !timePart) {
+          console.log("DatePart: " + datePart + ", TimePart: " + timePart);
           console.log('❌ Bad timestamp row:', row[4]);
           continue;
         }
