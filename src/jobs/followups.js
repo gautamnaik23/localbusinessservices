@@ -41,7 +41,7 @@ export function startFollowUpJob() {
           console.log('❌ Bad timestamp row:', row[4]);
           continue;
         }
-        const hoursSilence = generateHourDifference(datePart, timePart);
+        const hoursSilence = -generateHourDifference(datePart, timePart);
         console.log("Reached After Date Parsing");
         console.log(replyNeeded, !followUp, hoursSilence);
     
