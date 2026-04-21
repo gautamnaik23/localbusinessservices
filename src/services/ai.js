@@ -79,6 +79,7 @@ Promotions: ${business.promotions || ""}
 
 CORE OBJECTIVE:
 - Help the customer AND move the conversation toward a booking or clear next step.
+- If the customer is responding to an appointment reminder or review request, respond accordingly! In these cases, the goal is NOT to sell. Sometimes, a response may not be needed. 
 
 ---
 

@@ -41,10 +41,6 @@ export async function getThreadHistory(businessId, threadId, sessionId) {
   if (rows.length === 0) return [];
   
   // Filter: businessId + threadId + sessionId
-  console.log(threadId, sessionId, businessId);
-  console.log(rows);
-  //const history = rows
-  //  .filter(row => row[0] === threadId && row[1] == sessionId && row[7] === businessId);  // A=threadId, B = sessionId, H=businessId
   const history = rows
     .filter(row => areEqual(row[0], threadId) && areEqual(row[1], sessionId) && areEqual(row[7], businessId));  // A=threadId, B = sessionId, H=businessId
 
