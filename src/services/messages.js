@@ -43,13 +43,26 @@ export async function getThreadHistory(businessId, threadId, sessionId) {
   // Filter: businessId + threadId + sessionId
   console.log(threadId, sessionId, businessId);
   console.log(rows);
-  for (row1 in rows) {
-    console.log(String.valueOf(threadId).equals(row1[0]), String.valueOf(sessionId).equals(row1[1]), String.valueOf(businessId).equals(row1[7]))
-    console.log(row1[0] === threadId, row1[1] == sessionId, row1[7] === businessId)
-  }
+  //const history = rows
+  //  .filter(row => row[0] === threadId && row[1] == sessionId && row[7] === businessId);  // A=threadId, B = sessionId, H=businessId
   const history = rows
-    .filter(row => row[0] === threadId && row[1] == sessionId && row[7] === businessId);  // A=threadId, B = sessionId, H=businessId
-  
+    .filter(row => areEqual(row[0], threadId) && areEqual(row[1], sessionId) && areEqual(row[7], businessId));  // A=threadId, B = sessionId, H=businessId
+
   console.log(`📜 History: ${history.length} messages for ${businessId}/${threadId}`);
   return history;
+}
+
+function areEqual(a, b) {
+    if (a == null || b == null) return a === b;
+
+    const numA = Number(a);
+    const numB = Number(b);
+
+    // Check if both are valid numbers
+    if (!Number.isNaN(numA) && !Number.isNaN(numB)) {
+        return numA === numB; // numeric comparison
+    }
+
+    // Fallback to string comparison
+    return String(a) === String(b);
 }
