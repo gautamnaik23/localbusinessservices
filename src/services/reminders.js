@@ -5,6 +5,7 @@
 import { getSheetsClient } from './sheets.js';
 import { sendNudge } from './scheduler.js';  // From scheduler.js
 import { generateHourDifference } from '../utils/ids.js';
+import { saveMessagesBatch } from './messages.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',
