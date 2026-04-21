@@ -5,7 +5,6 @@ import { getBusinessConfig } from '../services/business.js';
 import { generateReply } from '../services/ai.js';
 import { senders } from '../services/outbound.js';
 import { generateSessionId } from "../utils/ids.js";
-import { getThreadBusiness, saveThreadMapping} from '../services/sheets.js';
 
 const router = Router();
 console.log("entered telegram.js");
@@ -23,9 +22,9 @@ router.post('/', async (req, res) => {
     let businessid;
     if (userMessage?.startsWith('/start ')) {
         businessid = userMessage.split(' ')[1];
-        await saveThreadMapping(chatId, businessid);  // Save once
+        //await saveThreadMapping(chatId, businessid);  // Save once
     } else {
-        businessid = await getThreadBusiness(chatId);  // Lookup
+        //businessid = await getThreadBusiness(chatId);  // Lookup
         if (!businessid) businessid = 'demo_business';  // Fallback
         }
     const sessionId = generateSessionId();
