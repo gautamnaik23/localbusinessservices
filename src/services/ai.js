@@ -51,7 +51,7 @@ function formatHistory(historyRows) {
  * @param {string} params.userMessage - The latest user message
  */
 export async function generateReply({ business, history, userMessage }) {
-  const model = genAI.getGenerativeModel({ model: "gemma-3-1b-it" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
   console.log("model created");
   const conversationHistory = formatHistory(history);
   console.log("CONVERSATION HISTORY: " + conversationHistory);
@@ -194,7 +194,7 @@ ${userMessage}
 
 // AI-personalized follow-up
 export async function generateFollowUp(history, business) {
-  const model = genAI.getGenerativeModel({ model: "gemma-3-1b-it" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
   const historySummary = history.slice(-5).map(row => `${row[2]}: ${row[3]}`).join('\n');
   
   const prompt = `Generate a short, personalized follow-up nudge based on this conversation:
