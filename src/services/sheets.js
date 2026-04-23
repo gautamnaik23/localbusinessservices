@@ -8,7 +8,9 @@ import { google } from "googleapis";
 const SHEET_CONFIG = {
   spreadsheetId: process.env.GOOGLE_SHEET_ID, // Your full Google Sheets ID
   conversationTab: "Conversation History", // Your first tab name
-  appointmentsTab: "AppointmentFakeTable"  // Your second tab name
+  appointmentsTab: "AppointmentFakeTable",  // Your second tab name
+  businessTab: "Business Information",
+  botTab: "BotMappings"
 };
 
 // Auth setup - converts the PEM key from environment variable format
@@ -69,7 +71,16 @@ export async function getBusinessFromChannelBot(channel, botToken) {
       return null;
     }
 
-    const rows = await readMappingRows();
+    const sheets = await getSheetsClient();
+
+    const range = `${SHEET_CONFIG.botTab}!A:C`;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_CONFIG.spreadsheetId,
+      range
+    });
+
+    const rows = response.data.values;
+    print(rows);
 
     for (const row of rows) {
       const rowChannel = row[0]?.trim();
@@ -93,28 +104,4 @@ export async function getBusinessFromChannelBot(channel, botToken) {
     console.error("❌ getBusinessFromChannelBot error:", error);
     return null;
   }
-}
-
-// READ SHEET ROWS
-// -----------------------------------------------------
-// Reads the full mapping tab and returns rows as arrays.
-// Expected sheet name can be adjusted below if needed.
-async function readMappingRows() {
-  const sheets = getSheetsClient();
-
-  const spreadsheetId = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM';
-  const sheetName = "BotMappings";
-
-  if (!spreadsheetId) {
-    throw new Error("Missing GOOGLESHEETID");
-  }
-
-  const range = `${sheetName}!A2:C`;
-
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range,
-  });
-
-  return response.data.values || [];
 }
