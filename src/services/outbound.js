@@ -24,4 +24,4 @@ export const senders = {
   // Add email, form, etc.
 };
 
-senders.send = (channel, threadId, message) => senders[channel]?.(threadId, message);
+senders.send = (channel, threadId, message, sender) => senders[channel]?.(threadId, message, sender);

@@ -7,6 +7,7 @@ import { sendNudge } from './scheduler.js';  // From scheduler.js
 import { generateHourDifference } from '../utils/ids.js';
 import { saveMessagesBatch } from './messages.js';
 import { getSenderInfo } from './sheets.js';
+import { senders } from './outbound.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',
@@ -54,10 +55,10 @@ export async function checkAllReminders() {
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
       
       const sender = await getSenderInfo(businessId, channel);
-
-      await sendNudge(threadId, {
-        message: reviewMsg
-      }, channel, sender);
+      await senders.send(channel, threadId, reviewMsg, sender);
+      //await sendNudge(threadId, {
+      //message: reviewMsg
+      //}, channel, sender);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder2h);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);
       continue
@@ -71,9 +72,10 @@ export async function checkAllReminders() {
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
       
       const sender = await getSenderInfo(businessId, channel);
-      await sendNudge(threadId, {
-        message: reviewMsg
-      }, channel, sender);
+      await senders.send(channel, threadId, reviewMsg, sender);
+      //await sendNudge(threadId, {
+      //message: reviewMsg
+      //}, channel, sender);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);  // Pass rowIdx
     }
     

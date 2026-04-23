@@ -29,6 +29,45 @@ function parseJsonFromText(text) {
   }
 }
 
+// =====================================================
+// FALLBACK MODELS (High demand → stable fallback)
+// =====================================================
+const PRIMARY_MODEL = "gemini-3.1-flash-lite-preview";
+const FALLBACK_MODEL = "gemini-2.5-flash";  // More stable, slightly slower
+
+/**
+ * Exponential backoff sleep
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Try a single model with retry logic
+ */
+async function tryModelWithRetry(model, prompt, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await model.generateContent(prompt);
+      return result;
+    } catch (error) {
+      const msg = String(error?.message || "");
+      const isRetryable = msg.includes("503") || 
+                         msg.includes("high demand") || 
+                         msg.includes("UNAVAILABLE") ||
+                         msg.includes("overloaded");
+
+      if (!isRetryable || attempt === maxRetries) {
+        throw error;
+      }
+
+      const delay = 1000 * Math.pow(2, attempt - 1) + Math.random() * 500;
+      console.log(`🔄 Gemini retry ${attempt}/${maxRetries} in ${delay.toFixed(0)}ms`);
+      await sleep(delay);
+    }
+  }
+}
+
 /**
  * Build the history string from previous messages.
  * We only include prior context here, not the current user message.
@@ -51,7 +90,8 @@ function formatHistory(historyRows) {
  * @param {string} params.userMessage - The latest user message
  */
 export async function generateReply({ business, history, userMessage }) {
-  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
+  const primaryModel = genAI.getGenerativeModel({ model: PRIMARY_MODEL });
+  const fallbackModel = genAI.getGenerativeModel({ model: FALLBACK_MODEL });
   console.log("model created");
   const conversationHistory = formatHistory(history);
   //console.log("CONVERSATION HISTORY: " + conversationHistory);
@@ -166,8 +206,26 @@ ${userMessage}
 `;
   
   try {
-    const result = await model.generateContent(prompt);
-    console.log("Response to Prompt created by Gemini")
+    let result;
+    try {
+    // 🔹 Try primary model first
+    result = await tryModelWithRetry(primaryModel, prompt);
+    console.log("✅ Primary model succeeded");
+  } catch (primaryError) {
+    console.warn("⚠️ Primary model failed, switching to fallback...", primaryError.message);
+
+    try {
+      // 🔹 Fallback model
+      result = await tryModelWithRetry(fallbackModel, prompt);
+      console.log("✅ Fallback model succeeded");
+    } catch (fallbackError) {
+      console.error("❌ Both models failed:", fallbackError);
+      return {
+        message: "Thanks for reaching out. I’m having a brief issue generating a response right now.",
+        expecting_reply: true
+      };
+    }
+  }
     const text = result.response.text();
 
     const parsed = parseJsonFromText(text);
@@ -186,7 +244,7 @@ ${userMessage}
   } catch (error) {
     console.error("Gemini error:", error);
     return {
-      message: "Thanks for reaching out — how can I help?",
+      message: "Thanks for reaching out. I’m having a brief issue generating a response right now.",
       expecting_reply: true
     };
   }
@@ -194,7 +252,8 @@ ${userMessage}
 
 // AI-personalized follow-up
 export async function generateFollowUp(history, business) {
-  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
+  const primaryModel = genAI.getGenerativeModel({ model: PRIMARY_MODEL });
+  const fallbackModel = genAI.getGenerativeModel({ model: FALLBACK_MODEL });
   const historySummary = history.slice(-5).map(row => `${row[2]}: ${row[3]}`).join('\n');
   
   const prompt = `Generate a short, personalized follow-up nudge based on this conversation:
@@ -213,6 +272,21 @@ Rules:
 
 Return ONLY the message text:`;
 
-  const result = await model.generateContent(prompt);
+  let result;
+
+  try {
+    result = await tryModelWithRetry(primaryModel, prompt);
+    console.log("✅ Follow-up: Primary model succeeded");
+  } catch (primaryError) {
+    console.warn("⚠️ Follow-up: Primary failed, using fallback...");
+
+    try {
+      result = await tryModelWithRetry(fallbackModel, prompt);
+      console.log("✅ Follow-up: Fallback model succeeded");
+    } catch (fallbackError) {
+      console.error("❌ Follow-up: Both models failed");
+      return "Just checking in—let me know if you'd like help booking!";
+    }
+  }
   return result.response.text().trim();
 }
