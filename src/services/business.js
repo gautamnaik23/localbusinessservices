@@ -24,6 +24,7 @@ const BUSINESS_SHEET_CONFIG = {
  * @returns {Object|null} Business config or null if not found
  */
 export async function getBusinessConfig(businessId) {
+  console.log(`🔍 Fetching config for businessId: ${businessId}`);
   if (!businessId) {
     console.error('No businessId provided');
     return null;

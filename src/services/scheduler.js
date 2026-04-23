@@ -6,14 +6,14 @@ import { senders } from './outbound.js';
 import checkAllReviews from './reviews.js';
 
 
-export async function sendNudge(threadId, data, channel) {
+export async function sendNudge(threadId, data, channel, sender) {
   switch (channel) {
     case 'widget':
       io.to(threadId).emit('nudge', data);  // Your widget
       break;
     case 'telegram':
       // Telegram API call
-      await senders.telegram(threadId, data.message);
+      await senders.telegram(threadId, data.message, sender);
       break;
     case 'sms':
       // SMS API (Twilio)

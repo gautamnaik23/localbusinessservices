@@ -22,13 +22,11 @@ router.post('/', async (req, res) => {
     const userMessage = update.message?.text;
     // Telegram sends: /start demobusiness. Use this to parse out id
     // Get businessid from /start OR lookup by chatId
-    let businessid;
-    businessid = getBusinessFromChannelBot('telegram', secret);
+
+    const [businessid, sender] = await getBusinessFromChannelBot('telegram', secret);
     
     if (!businessid) businessid = 'demo_business';  // Fallback
     const sessionId = generateSessionId();
-
-    if (!businessid) businessid = 'demo_business';
 
     if (!chatId || !userMessage) {
       return res.status(400).json({ error: 'Missing chat.id or text' });
@@ -56,7 +54,7 @@ router.post('/', async (req, res) => {
     ], 'telegram');
 
     // Send reply back to Telegram
-    await senders.telegram(chatId.toString(), aiResponse.message);
+    await senders.telegram(chatId.toString(), aiResponse.message, sender);
 
     res.json({ ok: true });
   } catch (err) {

@@ -7,6 +7,7 @@ import { generateFollowUp } from '../services/ai.js';
 import { getThreadHistory } from '../services/messages.js';
 import { getBusinessConfig } from '../services/business.js';
 import { generateHourDifference, splitDateTime } from '../utils/ids.js';
+import { getSenderInfo } from '../services/sheets.js';
 
 const SHEET_ID = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM'
 const MESSAGES_TAB = 'Conversation History';
@@ -28,8 +29,8 @@ export function startFollowUpJob() {
     const threadStates = {};
     const seen = new Set();
     for (const row of rows.slice().reverse()) {  // Newest first
-      console.log("This is the date/time: " + row[4]);
-      console.log("This is the message: " + row[3]);
+      //console.log("This is the date/time: " + row[4]);
+      //console.log("This is the message: " + row[3]);
       const threadId = row[0];
       if (!threadStates[threadId] && !seen.has(threadId)) {
         const replyNeeded = row[5] === 'TRUE';
@@ -37,16 +38,16 @@ export function startFollowUpJob() {
         const { datePart, timePart } = splitDateTime(row[4]);
         //console.log("This is the datePart:" + datePart + " And this is the time Part: " + timePart + " The original is: " + row[4]);
         if (!datePart || !timePart) {
-          console.log("DatePart: " + datePart + ", TimePart: " + timePart);
-          console.log('❌ Bad timestamp row:', row[4]);
+          //console.log("DatePart: " + datePart + ", TimePart: " + timePart);
+          //console.log('❌ Bad timestamp row:', row[4]);
           continue;
         }
         const hoursSilence = -generateHourDifference(datePart, timePart);
-        console.log("Reached After Date Parsing");
-        console.log(replyNeeded, !followUp, hoursSilence);
+        //console.log("Reached After Date Parsing");
+        //console.log(replyNeeded, !followUp, hoursSilence);
     
         if (replyNeeded && followUp && hoursSilence > 0.1) {
-            console.log("Added to list");
+            //console.log("Added to list");
             threadStates[threadId] = {
               threadId, 
               businessId: row[7], 
@@ -71,12 +72,13 @@ export function startFollowUpJob() {
         
         // 2. Get business config
         const business = await getBusinessConfig(thread.businessId);
+        const sender = await getSenderInfo(thread.businessId, thread.channel);
         
         // 3. AI generates personalized nudge
         const nudgeMsg = await generateFollowUp(history, business);
   
         // 4. Send via channel
-        const success = await senders[thread.channel]?.(thread.threadId, nudgeMsg);
+        const success = await senders[thread.channel]?.(thread.threadId, nudgeMsg, sender);
   
         if (success) {
             await markFollowUpSent(sheets, thread.rowIndex);

@@ -63,40 +63,43 @@ export async function getConversationHistory(businessId, threadId, sessionId) {
 
 // LOOKUP BY CHANNEL + BOT TOKEN
 // -----------------------------------------------------
-// Returns businessId
-export async function getBusinessFromChannelBot(channel, botToken) {
+// Returns businessId, token
+export async function getBusinessFromChannelBot(channel, secret) {
   try {
-    if (!channel || !botToken) {
-      console.log("❌ Missing channel or botToken:", { channel, botToken });
+    if (!channel || !secret) {
+      console.log("❌ Missing channel or botToken:", { channel, secret });
       return null;
     }
 
     const sheets = await getSheetsClient();
 
-    const range = `${SHEET_CONFIG.botTab}!A:C`;
+    const range = `${SHEET_CONFIG.botTab}!A:D`;
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_CONFIG.spreadsheetId,
       range
     });
 
     const rows = response.data.values;
-    console.log(rows);
+    console(rows);
 
     for (const row of rows) {
       const rowChannel = row[0]?.trim();
-      const rowBotToken = row[1]?.trim();
-      const rowBusinessId = row[2]?.trim();
+      const rowSender = row[1]?.trim();
+      const rowSecret = row[2]?.trim();
+      const rowBusinessId = row[3]?.trim();
 
       if (
         rowChannel &&
-        rowBotToken &&
+        rowSender &&
+        rowSecret &&
         rowBusinessId &&
         rowChannel.toLowerCase() === channel.toLowerCase() &&
-        rowBotToken === botToken
+        rowSecret === secret
       ) {
-        return rowBusinessId;
+        return [rowBusinessId, rowSender];
       }
     }
+
 
     console.log("❌ No mapping found for:", { channel, botToken });
     return null;
@@ -104,4 +107,50 @@ export async function getBusinessFromChannelBot(channel, botToken) {
     console.error("❌ getBusinessFromChannelBot error:", error);
     return null;
   }
+}
+
+//converts a businessId + channel to a sender name
+export async function getSenderInfo(businessId, channel) {
+    try {
+    if (!channel || !businessId) {
+      console.log("❌ Missing businessId or channel:", { channel, businessId });
+      return null;
+    }
+
+    const sheets = await getSheetsClient();
+
+    const range = `${SHEET_CONFIG.botTab}!A:D`;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_CONFIG.spreadsheetId,
+      range
+    });
+
+    const rows = response.data.values;
+
+    for (const row of rows) {
+      const rowChannel = row[0]?.trim();
+      const rowSender = row[1]?.trim();
+      const rowSecret = row[2]?.trim();
+      const rowBusinessId = row[3]?.trim();
+
+      if (
+        rowChannel &&
+        rowSender &&
+        rowSecret &&
+        rowBusinessId &&
+        rowChannel.toLowerCase() === channel.toLowerCase() &&
+        rowBusinessId === businessId
+      ) {
+        return rowSender;
+      }
+    }
+
+
+    console.log("❌ No mapping found for:", { channel, botToken });
+    return null;
+  } catch (error) {
+    console.error("❌ getBusinessFromChannelBot error:", error);
+    return null;
+  }
+
 }

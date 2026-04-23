@@ -7,6 +7,7 @@ import { senders } from './outbound.js';
 import { getBusinessConfig } from './business.js';
 import { generateHourDifference } from '../utils/ids.js';
 import { saveMessagesBatch } from './messages.js';
+import { getSenderInfo } from './sheets.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',  // Same as reminders
@@ -55,7 +56,9 @@ export async function checkAllReviews() {
       
       try {
         await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
-        await senders.send(channel, threadId, reviewMsg);
+
+        const sender = await getSenderInfo(businessId, channel);
+        await senders.send(channel, threadId, reviewMsg, sender);
         await markReviewSent(sheets, rowIdx, CONFIG.cols.reviewSent);
         console.log(`⭐ Review request → ${threadId} (${channel})`);
       } catch (err) {

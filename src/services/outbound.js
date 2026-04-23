@@ -7,10 +7,9 @@ export const senders = {
     console.log(`Widget nudge: ${threadId} → ${message}`);
     return true;
   },
-  telegram: async (chatId, message) => {
+  telegram: async (chatId, message, sender) => {
     // Telegram Bot API
-    const token = '8644746859:AAG6Kbo1l_gIbrh-sPfnK2u_zeFMiKW7fZ0';
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    await fetch(`https://api.telegram.org/bot${sender}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text: message })

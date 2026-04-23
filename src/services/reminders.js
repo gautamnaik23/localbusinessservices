@@ -6,6 +6,7 @@ import { getSheetsClient } from './sheets.js';
 import { sendNudge } from './scheduler.js';  // From scheduler.js
 import { generateHourDifference } from '../utils/ids.js';
 import { saveMessagesBatch } from './messages.js';
+import { getSenderInfo } from './sheets.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',
@@ -51,9 +52,12 @@ export async function checkAllReminders() {
       //console.log("sending 2hr reminder for " + apptDateStr + " " + apptTime);
       const reviewMsg = 'Just a quick reminder — your appointment today at ' + apptTime +  ' is coming up soon. See you shortly 😊';
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
+      
+      const sender = await getSenderInfo(businessId, channel);
+
       await sendNudge(threadId, {
         message: reviewMsg
-      }, channel);
+      }, channel, sender);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder2h);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);
       continue
@@ -65,9 +69,11 @@ export async function checkAllReminders() {
       //console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime + "    " + diffHours);
       const reviewMsg = 'Hi! Just a reminder that you have an appointment scheduled for ' + apptTime + ' on ' + apptDateStr + ' . Let us know if you need to reschedule!'
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
+      
+      const sender = await getSenderInfo(businessId, channel);
       await sendNudge(threadId, {
         message: reviewMsg
-      }, channel);
+      }, channel, sender);
       await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);  // Pass rowIdx
     }
     
