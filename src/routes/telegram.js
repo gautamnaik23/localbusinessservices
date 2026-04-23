@@ -23,8 +23,10 @@ router.post('/', async (req, res) => {
     // Telegram sends: /start demobusiness. Use this to parse out id
     // Get businessid from /start OR lookup by chatId
 
-    const [businessid, sender] = await getBusinessFromChannelBot('telegram', secret);
-    
+    const businessInfo = await getBusinessFromChannelBot('telegram', secret);
+    const businessid = businessInfo?.businessId;
+    const sender = businessInfo?.token;
+
     if (!businessid) businessid = 'demo_business';  // Fallback
     const sessionId = generateSessionId();
 

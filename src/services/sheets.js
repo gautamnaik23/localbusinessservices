@@ -63,7 +63,7 @@ export async function getConversationHistory(businessId, threadId, sessionId) {
 
 // LOOKUP BY CHANNEL + BOT TOKEN
 // -----------------------------------------------------
-// Returns businessId, token
+// Returns {businessId: businessId, token: sender} or null if not found
 export async function getBusinessFromChannelBot(channel, secret) {
   try {
     if (!channel || !secret) {
@@ -80,7 +80,7 @@ export async function getBusinessFromChannelBot(channel, secret) {
     });
 
     const rows = response.data.values;
-    console(rows);
+    console.log(rows);
 
     for (const row of rows) {
       const rowChannel = row[0]?.trim();
@@ -96,10 +96,12 @@ export async function getBusinessFromChannelBot(channel, secret) {
         rowChannel.toLowerCase() === channel.toLowerCase() &&
         rowSecret === secret
       ) {
-        return [rowBusinessId, rowSender];
+        return {
+          businessId: rowBusinessId,
+          token: rowSender
+        };
       }
-    }
-
+        }
 
     console.log("❌ No mapping found for:", { channel, botToken });
     return null;
