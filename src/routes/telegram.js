@@ -5,6 +5,7 @@ import { getBusinessConfig } from '../services/business.js';
 import { generateReply } from '../services/ai.js';
 import { senders } from '../services/outbound.js';
 import { generateSessionId } from "../utils/ids.js";
+import { getBusinessFromChannelBot } from '../services/sheets.js';
 
 const router = Router();
 console.log("entered telegram.js");
@@ -12,6 +13,8 @@ console.log("entered telegram.js");
 router.post('/', async (req, res) => {
   try {
     console.log("executing telegram.js")
+    const secret = req.headers['x-telegram-bot-api-secret-token'];
+    console.log('🔑 Bot secret header:', secret);
     const update = req.body;
     
     // Telegram webhook payload
@@ -20,14 +23,12 @@ router.post('/', async (req, res) => {
     // Telegram sends: /start demobusiness. Use this to parse out id
     // Get businessid from /start OR lookup by chatId
     let businessid;
-    if (userMessage?.startsWith('/start ')) {
-        businessid = userMessage.split(' ')[1];
-        //await saveThreadMapping(chatId, businessid);  // Save once
-    } else {
-        //businessid = await getThreadBusiness(chatId);  // Lookup
-        if (!businessid) businessid = 'demo_business';  // Fallback
-        }
+    businessid = getBusinessFromChannelBot('telegram', secret);
+    
+    if (!businessid) businessid = 'demo_business';  // Fallback
     const sessionId = generateSessionId();
+
+    if (!businessid) businessid = 'demo_business';
 
     if (!chatId || !userMessage) {
       return res.status(400).json({ error: 'Missing chat.id or text' });

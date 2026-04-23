@@ -58,3 +58,63 @@ export async function getConversationHistory(businessId, threadId, sessionId) {
     return row[7] === businessId && row[0] === threadId && row[1] === sessionId; // business ID is column H (index 7)
   });
 }
+
+// LOOKUP BY CHANNEL + BOT TOKEN
+// -----------------------------------------------------
+// Returns businessId
+export async function getBusinessFromChannelBot(channel, botToken) {
+  try {
+    if (!channel || !botToken) {
+      console.log("❌ Missing channel or botToken:", { channel, botToken });
+      return null;
+    }
+
+    const rows = await readMappingRows();
+
+    for (const row of rows) {
+      const rowChannel = row[0]?.trim();
+      const rowBotToken = row[1]?.trim();
+      const rowBusinessId = row[2]?.trim();
+
+      if (
+        rowChannel &&
+        rowBotToken &&
+        rowBusinessId &&
+        rowChannel.toLowerCase() === channel.toLowerCase() &&
+        rowBotToken === botToken
+      ) {
+        return rowBusinessId;
+      }
+    }
+
+    console.log("❌ No mapping found for:", { channel, botToken });
+    return null;
+  } catch (error) {
+    console.error("❌ getBusinessFromChannelBot error:", error);
+    return null;
+  }
+}
+
+// READ SHEET ROWS
+// -----------------------------------------------------
+// Reads the full mapping tab and returns rows as arrays.
+// Expected sheet name can be adjusted below if needed.
+async function readMappingRows() {
+  const sheets = getSheetsClient();
+
+  const spreadsheetId = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM';
+  const sheetName = "BotMappings";
+
+  if (!spreadsheetId) {
+    throw new Error("Missing GOOGLESHEETID");
+  }
+
+  const range = `${sheetName}!A2:C`;
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range,
+  });
+
+  return response.data.values || [];
+}
