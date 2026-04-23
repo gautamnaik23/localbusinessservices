@@ -54,7 +54,7 @@ export async function generateReply({ business, history, userMessage }) {
   const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
   console.log("model created");
   const conversationHistory = formatHistory(history);
-  console.log("CONVERSATION HISTORY: " + conversationHistory);
+  //console.log("CONVERSATION HISTORY: " + conversationHistory);
 
   const prompt = `
 You are a friendly and highly effective AI virtual receptionist.

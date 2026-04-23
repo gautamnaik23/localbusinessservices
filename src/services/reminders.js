@@ -48,7 +48,7 @@ export async function checkAllReminders() {
     // 2h reminder
     const sent2h = row[CONFIG.cols.reminder2h] === 'TRUE';
     if (!sent2h && diffHours > 0 && diffHours <= 2) {
-      console.log("sending 2hr reminder for " + apptDateStr + " " + apptTime);
+      //console.log("sending 2hr reminder for " + apptDateStr + " " + apptTime);
       const reviewMsg = 'Just a quick reminder — your appointment today at ' + apptTime +  ' is coming up soon. See you shortly 😊';
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
       await sendNudge(threadId, {
@@ -62,7 +62,7 @@ export async function checkAllReminders() {
     // 24h reminder
     const sent24h = row[CONFIG.cols.reminder24h] === 'TRUE';
     if (!sent24h && diffHours > 2 && diffHours <= 24) {
-      console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime + "    " + diffHours);
+      //console.log("sending 24hr reminder for " + apptDateStr + " " + apptTime + "    " + diffHours);
       const reviewMsg = 'Hi! Just a reminder that you have an appointment scheduled for ' + apptTime + ' on ' + apptDateStr + ' . Let us know if you need to reschedule!'
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
       await sendNudge(threadId, {
