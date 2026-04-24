@@ -7,11 +7,33 @@
   <link rel="stylesheet" href="/public/widget.css" />
 </head>
 <body>
-  <div id="chat-widget">
+
+  <!-- Launcher Button -->
+  <div id="chat-launcher">💬</div>
+
+  <!-- Chat Widget -->
+  <div id="chat-widget" class="hidden">
+    
+    <div class="chat-header">
+      <div>
+        <div class="chat-title">Support</div>
+        <div class="chat-status">Online</div>
+      </div>
+      <button id="closeChat">✕</button>
+    </div>
+
     <div id="messages"></div>
-    <input id="messageInput" type="text" placeholder="Type a message..." />
-    <button id="sendButton">Send</button>
+
+    <!-- Typing Indicator -->
+    <div id="typing" class="hidden">Typing...</div>
+
+    <div class="chat-input">
+      <input id="messageInput" type="text" placeholder="Type your message..." />
+      <button id="sendButton">➤</button>
+    </div>
+
   </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="/public/widget.js"></script>
 </body>
