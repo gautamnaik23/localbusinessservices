@@ -8,7 +8,7 @@ export const senders = {
     // Widget push (WebSocket or HTTP)
     const msg = message
     console.log(`Widget nudge: ${threadId} → ${message}`);
-    io.to(threadId).emit('nudge', { message: msg });
+    io.to(threadId).emit('nudge', { msg });
     return true;
   },
   telegram: async (chatId, message, sender) => {
