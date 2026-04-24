@@ -19,6 +19,10 @@ body {
   font-size: 24px;
   cursor: pointer;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#chat-launcher:hover {
+  transform: scale(1.05);
 }
 
 /* Widget */
@@ -34,6 +38,19 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Animation */
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+
+  transition: 
+  opacity 0.18s ease-out,
+  transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#chat-widget.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Header */
@@ -120,7 +137,46 @@ body {
   padding: 0 16px;
   cursor: pointer;
 }
-
+/*
 .hidden {
   display: none !important;
+}*/
+
+/* Typing container */
+.typing {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+/* Each dot */
+.typing span {
+  width: 6px;
+  height: 6px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+
+/* Stagger the animation */
+.typing span:nth-child(1) {
+  animation-delay: 0s;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Animation */
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
 }

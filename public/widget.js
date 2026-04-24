@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputEl = document.getElementById("messageInput");
   const buttonEl = document.getElementById("sendButton");
   const typingEl = document.getElementById("typing");
-  widget.style.display = "none";
+  //widget.style.display = "none";
 
   if (!launcher || !widget || !closeBtn) {
     console.error("❌ Chat elements not found");
@@ -48,15 +48,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // UI TOGGLE
   // ===============================
   launcher.onclick = () => {
-    if (widget.style.display === "none" || widget.style.display === "") {
+    /*if (widget.style.display === "none" || widget.style.display === "") {
     widget.style.display = "flex";
   } else {
     widget.style.display = "none";
-  }
+  }*/
+    widget.classList.toggle("open");
   };
 
   closeBtn.onclick = () => {
-    widget.style.display = "none";
+    //widget.style.display = "none";
+    widget.classList.remove("open");
   };
 
   // ===============================
