@@ -138,9 +138,9 @@ body {
   cursor: pointer;
 }
 /* Hidden class for toggling visibility */
-.hidden {
+/*.hidden {
   display: none !important;
-}
+}*/
 
 /* Typing container */
 .typing {
