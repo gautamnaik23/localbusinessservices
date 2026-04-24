@@ -8,7 +8,6 @@ import { getBusinessConfig } from './business.js';
 import { generateHourDifference } from '../utils/ids.js';
 import { saveMessagesBatch } from './messages.js';
 import { getSenderInfo } from './sheets.js';
-import { sendNudge } from './scheduler.js';
 
 const CONFIG = {
   tabName: 'AppointmentFakeTable',  // Same as reminders
