@@ -137,10 +137,10 @@ body {
   padding: 0 16px;
   cursor: pointer;
 }
-/*
+/* Hidden class for toggling visibility */
 .hidden {
   display: none !important;
-}*/
+}
 
 /* Typing container */
 .typing {
