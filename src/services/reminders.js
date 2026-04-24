@@ -3,7 +3,6 @@
 // Updates flags when sent.
 
 import { getSheetsClient } from './sheets.js';
-import { sendNudge } from './scheduler.js';  // From scheduler.js
 import { generateHourDifference } from '../utils/ids.js';
 import { saveMessagesBatch } from './messages.js';
 import { getSenderInfo } from './sheets.js';
