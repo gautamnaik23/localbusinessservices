@@ -77,12 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // TYPING
   // ===============================
   function showTyping() {
-    typingEl.classList.remove("hidden");
+    typingEl.classList.add("open");
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function hideTyping() {
-    typingEl.classList.add("hidden");
+    typingEl.classList.remove("open");
   }
 
   // ===============================
