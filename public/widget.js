@@ -5,9 +5,27 @@ const socket = io();
 // ===============================
 // ELEMENTS
 // ===============================
-const launcher = document.getElementById("chat-launcher");
-const widget = document.getElementById("chat-widget");
-const closeBtn = document.getElementById("closeChat");
+document.addEventListener("DOMContentLoaded", () => {
+  const launcher = document.getElementById("chat-launcher");
+  const widget = document.getElementById("chat-widget");
+  const closeBtn = document.getElementById("closeChat");
+
+  if (!launcher || !widget || !closeBtn) {
+    console.error("❌ Chat elements not found");
+    return;
+  }
+
+  // ===============================
+  // UI TOGGLE (launcher)
+  // ===============================
+  launcher.onclick = () => {
+    widget.classList.toggle("hidden");
+  };
+
+  closeBtn.onclick = () => {
+    widget.classList.add("hidden");
+  };
+});
 
 const messagesEl = document.getElementById("messages");
 const inputEl = document.getElementById("messageInput");
@@ -29,17 +47,6 @@ if (!threadId) {
 
 // Join socket room
 socket.emit("join-thread", threadId);
-
-// ===============================
-// UI TOGGLE (launcher)
-// ===============================
-launcher.onclick = () => {
-  widget.classList.toggle("hidden");
-};
-
-closeBtn.onclick = () => {
-  widget.classList.add("hidden");
-};
 
 // ===============================
 // MESSAGE RENDERING
