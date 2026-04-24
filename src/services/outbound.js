@@ -1,10 +1,13 @@
 // src/senders/router.js
 // Universal sender router: channel → sender function
 
+import { io } from '../server.js'; 
+
 export const senders = {
-  widget: async (threadId, message) => {
+  widget: async (threadId, message, sender) => {
     // Widget push (WebSocket or HTTP)
     console.log(`Widget nudge: ${threadId} → ${message}`);
+    io.to(threadId).emit('nudge', message);
     return true;
   },
   telegram: async (chatId, message, sender) => {
