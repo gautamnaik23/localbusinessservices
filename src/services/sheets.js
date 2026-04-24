@@ -148,7 +148,7 @@ export async function getSenderInfo(businessId, channel) {
     }
 
 
-    console.log("❌ No mapping found for:", { channel, botToken });
+    console.log("❌ No mapping found for:", { channel, businessId });
     return null;
   } catch (error) {
     console.error("❌ getBusinessFromChannelBot error:", error);

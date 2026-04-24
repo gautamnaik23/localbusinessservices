@@ -36,10 +36,6 @@ body {
   overflow: hidden;
 }
 
-.hidden {
-  display: none;
-}
-
 /* Header */
 .chat-header {
   background: #2563eb;
@@ -124,6 +120,7 @@ body {
   padding: 0 16px;
   cursor: pointer;
 }
+
 .hidden {
-  display: none;
+  display: none !important;
 }
