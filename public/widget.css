@@ -169,7 +169,7 @@ body {
 
 
 /* Each dot */
-.typing span {
+#typing span {
   width: 6px;
   height: 6px;
   background: #9ca3af;
@@ -178,13 +178,13 @@ body {
 }
 
 /* Stagger the animation */
-.typing span:nth-child(1) {
+#typing span:nth-child(1) {
   animation-delay: 0s;
 }
-.typing span:nth-child(2) {
+#typing span:nth-child(2) {
   animation-delay: 0.2s;
 }
-.typing span:nth-child(3) {
+#typing span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
