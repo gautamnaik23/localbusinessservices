@@ -1,6 +1,7 @@
 // public/widget.js
-
+console.log("🔥 widget.js loaded");
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM loaded");
 
   const socket = io();
 
@@ -10,6 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const launcher = document.getElementById("chat-launcher");
   const widget = document.getElementById("chat-widget");
   const closeBtn = document.getElementById("closeChat");
+  console.log({
+  launcher: document.getElementById("chat-launcher"),
+  widget: document.getElementById("chat-widget"),
+  closeBtn: document.getElementById("closeChat")
+  });
 
   const messagesEl = document.getElementById("messages");
   const inputEl = document.getElementById("messageInput");
