@@ -6,8 +6,9 @@ import { io } from '../server.js';
 export const senders = {
   widget: async (threadId, message, sender) => {
     // Widget push (WebSocket or HTTP)
+    const nudgeId = `nudge_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    console.log(`🚀 EMIT NUDGE [${nudgeId}]: ${threadId} → ${message.slice(0,50)}`);
     console.log(`Widget nudge: ${threadId} → ${message}`);
-    console.log('EMIT NUDGE:', { threadId, message });
     io.to(threadId).emit('nudge', { message });
     return true;
   },
