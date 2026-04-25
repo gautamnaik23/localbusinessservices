@@ -82,8 +82,6 @@ export function startFollowUpJob() {
   
         if (success) {
             await markFollowUpSent(sheets, thread.rowIndex);
-            // 🚀 PUSH TO Route (real-time!)
-            io.to(thread.threadId).emit('nudge', { message: nudgeMsg });
             console.log(`✅ AI nudge sent: ${thread.channel}/${thread.threadId}`);
   }
 }
