@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // SOCKET EVENTS
   // ===============================
   socket.on("nudge", (data) => {
+    console.log('RECEIVED NUDGE:', data);
     addMessage(data.message, "bot");
   });
 
