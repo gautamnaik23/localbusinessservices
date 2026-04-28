@@ -50,19 +50,19 @@ app.use(express.urlencoded({ extended: true }));
 // SERVE STATIC FILES (Widget HTML/CSS/JS)
 // =====================================================
 // Serve public/widget.html at /public/widget.html
-app.use("/public/", express.static(path.join(__dirname, "..", "public")));
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 // =====================================================
 // WEBHOOK ROUTES
 // =====================================================
-app.use("/webhook/widget/", widgetRoutes);
-app.use("/webhook/telegram/", telegramRoutes);
-app.use("/webhook/email/", emailRoutes);
+app.use("/webhook/widget", widgetRoutes);
+app.use("/webhook/telegram", telegramRoutes);
+app.use("/webhook/email", emailRoutes);
 
 // =====================================================
 // HEALTH CHECK + HOMEPAGE
 // =====================================================
-app.get("/health/", (req, res) => {
+app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
