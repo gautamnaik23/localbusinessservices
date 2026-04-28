@@ -2,6 +2,7 @@
 // Universal sender router: channel → sender function
 
 import { io } from '../server.js'; 
+import { sendGmailEmail } from '../routes/gmail.js';
 
 export const senders = {
   widget: async (threadId, message, sender) => {
@@ -18,6 +19,32 @@ export const senders = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text: message })
+    });
+    return true;
+  },
+  email: async (customeremailAddress, businessEmailAddress, message, business, senderRefreshToken) => {
+    console.log(`📧 Email reply: ${customeremailAddress} → ${message.slice(0,50)}`);
+    const clientId = process.env.GMAIL_CLIENT_ID;
+    const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+
+    // Send the reply using the business's connected Gmail account.
+    await sendGmailEmail({
+      to: customeremailAddress,
+      subject: 'Re: Your inquiry',
+      html: `
+        <p>${message}</p>
+        <hr>
+        <small>
+          ${business.businessName}<br>
+          ${business.phoneNumber || ''}<br>
+          <a href="${business.bookingLink || '#'}">Book Now</a>
+        </small>
+      `,
+      businessName: business.businessName,
+      businessEmail: businessEmailAddress,
+      clientId: clientId,
+      clientSecret: clientSecret,
+      refreshToken: senderRefreshToken
     });
     return true;
   },

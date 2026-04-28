@@ -20,6 +20,7 @@ import { Server } from "socket.io";    // 7️⃣ WebSocket server (widget realt
 // =====================================================
 import telegramRoutes from './routes/telegram.js'; 
 import widgetRoutes from "./routes/widget.js";
+import emailRoutes from './routes/email.js';
 
 // =====================================================
 // IMPORT JOBS (Run after server starts)
@@ -56,6 +57,7 @@ app.use("/public", express.static(path.join(__dirname, "..", "public")));
 // =====================================================
 app.use("/webhook/widget", widgetRoutes);
 app.use("/webhook/telegram", telegramRoutes);
+app.use("/webhook/email", emailRoutes);
 
 // =====================================================
 // HEALTH CHECK + HOMEPAGE
