@@ -24,6 +24,13 @@ export async function createGmailTransporter({
   refreshToken,
   email
 }) {
+  console.log('🔥 OAuth DEBUG:', {
+    hasClientId: !!clientId,
+    clientIdPreview: clientId?.slice(0, 20) + '...',
+    hasClientSecret: !!clientSecret,
+    hasRefreshToken: !!refreshToken,
+    email
+  });
   // Create the OAuth2 client with the Google app credentials.
   const oauth2Client = new OAuth2(
     clientId,
@@ -37,6 +44,7 @@ export async function createGmailTransporter({
   // Ask Google for a short-lived access token.
   // Nodemailer uses this token to authenticate with Gmail SMTP.
   const accessTokenResponse = await oauth2Client.getAccessToken();
+  console.log('✅ Access token OK');
   const accessToken = accessTokenResponse?.token;
 
   // If we did not get a token, stop immediately.

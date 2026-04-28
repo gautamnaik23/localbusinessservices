@@ -103,7 +103,7 @@ export async function getBusinessFromChannelBot(channel, secret) {
       }
         }
 
-    console.log("❌ No mapping found for:", { channel, botToken });
+    console.log("❌ No mapping found for:", { channel, secret });
     return null;
   } catch (error) {
     console.error("❌ getBusinessFromChannelBot error:", error);
