@@ -101,7 +101,7 @@ export { io };
 // START JOBS (After server ready)
 // =====================================================
 // ✅ Cron jobs (follow-up emails/texts)
-startFollowUpJob();
+//startFollowUpJob();
 
 
 // =====================================================
@@ -110,5 +110,5 @@ startFollowUpJob();
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server + WebSockets on port ${PORT}`);
   // ✅ START SCHEDULER LAST (needs server ready)
-  import("./services/scheduler.js");
+  //import("./services/scheduler.js");
 });

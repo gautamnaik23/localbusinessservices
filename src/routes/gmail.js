@@ -53,8 +53,11 @@ export async function createGmailTransporter({
   }
 
   // Create the SMTP transporter that will actually send the email.
-  return nodemailer.createTransport({
-    service: 'gmail',
+  // ✅ FIX: Port 587 + STARTTLS (works on Render/Fly.io)
+  return nodemailer.createTransporter({
+    host: 'smtp.gmail.com',
+    port: 587,           
+    secure: false,      
     auth: {
       type: 'OAuth2',
       user: email,
@@ -62,8 +65,14 @@ export async function createGmailTransporter({
       clientSecret,
       refreshToken,
       accessToken
-    }
+    },
+    // ✅ IPv6 workaround
+    family: 4,           // Force IPv4 only
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100
   });
+}
 }
 
 /**
