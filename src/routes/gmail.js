@@ -54,7 +54,7 @@ export async function createGmailTransporter({
 
   // Create the SMTP transporter that will actually send the email.
   // ✅ FIX: Port 587 + STARTTLS (works on Render/Fly.io)
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,           
     secure: false,      
