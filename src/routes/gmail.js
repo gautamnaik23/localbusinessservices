@@ -73,7 +73,6 @@ export async function createGmailTransporter({
     maxMessages: 100
   });
 }
-}
 
 /**
  * Send one email through the business's Gmail account.
