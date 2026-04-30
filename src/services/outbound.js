@@ -3,6 +3,8 @@
 
 import { io } from '../server.js'; 
 import { sendGmailEmail } from '../routes/gmail.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const senders = {
   widget: async (threadId, message, sender) => {
