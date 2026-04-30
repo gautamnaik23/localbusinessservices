@@ -70,6 +70,14 @@ app.get("/", (req, res) => {
   res.send("AI receptionist backend is running.");
 });
 
+app.get('/debug/env', (req, res) => {
+  res.json({
+    gmailClientId: process.env.GMAIL_CLIENT_ID ? 'LOADED ✅' : 'MISSING ❌',
+    gmailClientSecret: process.env.GMAIL_CLIENT_SECRET ? 'LOADED ✅' : 'MISSING ❌',
+    hasDotenv: !!process.env.GMAIL_CLIENT_ID
+  });
+});
+
 app.use("*", (req, res) => {
   console.log("❌ 404:", req.method, req.path);
   res.status(404).send("Not found");
