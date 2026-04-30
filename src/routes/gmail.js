@@ -32,11 +32,7 @@ export async function createGmailTransporter({
     email
   });
   // Create the OAuth2 client with the Google app credentials.
-  const oauth2Client = new OAuth2(
-    clientId,
-    clientSecret,
-    'https://developers.google.com/oauthplayground'
-  );
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
   // Give the OAuth2 client the refresh token.
   // This lets Google issue a new access token when needed.
   oauth2Client.setCredentials({ refresh_token: refreshToken });
@@ -45,7 +41,9 @@ export async function createGmailTransporter({
   // Nodemailer uses this token to authenticate with Gmail SMTP.
   const accessTokenResponse = await oauth2Client.getAccessToken();
   console.log('✅ Access token OK');
-  const accessToken = accessTokenResponse?.token;
+  const accessToken = (await oauth2Client.getAccessToken()).token;
+
+  const gmail = google.gmail({ version: 'v1', auth: accessToken });
 
   // If we did not get a token, stop immediately.
   if (!accessToken) {
@@ -95,12 +93,36 @@ export async function sendGmailEmail({
   clientSecret,
   refreshToken
 }) {
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+  const accessToken = (await oauth2Client.getAccessToken()).token;
+
+  const gmail = google.gmail({ version: 'v1', auth: accessToken });
+
+  const message = [
+    `From: ${businessName} <${businessEmail}>`,
+    `To: ${to}`,
+    'Content-Type: text/html; charset=utf-8',
+    `Subject: ${subject}`,
+    '', // Empty line
+    html
+  ].join('\n');
+
+  const encodedMessage = Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
+
+  await gmail.users.messages.send({
+    userId: 'me',
+    requestBody: {
+      raw: encodedMessage
+    }
+  });
+/*
   // Build the Gmail transporter for this business.
   const transporter = await createGmailTransporter({
     clientId,
     clientSecret,
     refreshToken,
-    email: businessEmail
+    email: businessEmail, 
   });
 
   // Send the actual email.
@@ -110,5 +132,5 @@ export async function sendGmailEmail({
     to,
     subject,
     html
-  });
+  });*/
 }
