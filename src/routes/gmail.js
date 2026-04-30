@@ -1,7 +1,5 @@
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
-//import dotenv from 'dotenv';
-//dotenv.config();
 
 // We use Google's OAuth2 client to get short-lived access tokens.
 // The refresh token stays stored in your business config.

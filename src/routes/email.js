@@ -32,6 +32,7 @@ router.post('/', async (req, res) => {
 
     // 1. Load business config FIRST
     const business = await getBusinessConfig(businessid);
+    console.log(business);
 
     // 3. Load conversation history (EXCLUDES current message)
     const history = await getThreadHistory(businessid, threadId, sessionId);
