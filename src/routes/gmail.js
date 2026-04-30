@@ -5,6 +5,8 @@ import { google } from 'googleapis';
 // The refresh token stays stored in your business config.
 // The access token is generated on demand.
 const OAuth2 = google.auth.OAuth2;
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
  * Create a Gmail transporter for one business.
