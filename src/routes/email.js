@@ -27,6 +27,7 @@ router.post('/', async (req, res) => {
     const senderRefreshToken = businessInfo?.token;
     if (!businessid) businessid = 'demo_business';  // Fallback
     const sessionId = generateSessionId();
+    console.log('Detected thread_id:', thread_id);
     const threadId = thread_id || customer_email;  // Real Gmail thread ID if available (optional, can use customer_email as fallback)
 
     console.log(`📧 Email [${businessid}]: ${customer_email} → "${message.slice(0,50)}"`);
