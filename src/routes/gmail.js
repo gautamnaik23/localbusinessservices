@@ -96,8 +96,11 @@ export async function sendGmailEmail({
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
   oauth2Client.setCredentials({ refresh_token: refreshToken });
   const accessToken = (await oauth2Client.getAccessToken()).token;
+  if (!accessToken.token) {
+    throw new Error('Failed to get Gmail access token');
+  }
 
-  const gmail = google.gmail({ version: 'v1', auth: accessToken });
+  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
   const message = [
     `From: ${businessName} <${businessEmail}>`,

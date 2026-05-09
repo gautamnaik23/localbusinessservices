@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 
     // Auto-detect business_id from sender domain if missing
     const businessInfo = await getBusinessFromChannelBot('email', receiver_email);
-    const businessid = businessInfo?.businessId || detectBusinessFromEmail(from_header);
+    let businessid = businessInfo?.businessId || detectBusinessFromEmail(from_header);
     const senderRefreshToken = businessInfo?.token;
     if (!businessid) businessid = 'demo_business';  // Fallback
     const sessionId = generateSessionId();
