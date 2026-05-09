@@ -113,6 +113,7 @@ export async function sendGmailEmail({
 
   const encodedMessage = Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
 
+  console.log(`📧 Sending Gmail to ${to}: ${subject}`);
   await gmail.users.messages.send({
     userId: 'me',
     requestBody: {

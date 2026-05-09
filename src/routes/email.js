@@ -17,7 +17,8 @@ router.post('/', async (req, res) => {
       subject,          // Original subject line  
       message,          // Email body
       sender_name,      // Optional: "John Doe <john@example.com>"
-      from_header       // Raw From: header for business matching
+      from_header,       // Raw From: header for business matching
+      thread_id         // Real Gmail thread ID if available (optional, can use customer_email as fallback)
     } = req.body;
 
     // Auto-detect business_id from sender domain if missing
@@ -26,7 +27,7 @@ router.post('/', async (req, res) => {
     const senderRefreshToken = businessInfo?.token;
     if (!businessid) businessid = 'demo_business';  // Fallback
     const sessionId = generateSessionId();
-    const threadId = customer_email;  // Use customer email as stable thread identifier
+    const threadId = thread_id || customer_email;  // Real Gmail thread ID if available (optional, can use customer_email as fallback)
 
     console.log(`📧 Email [${businessid}]: ${customer_email} → "${message.slice(0,50)}"`);
 

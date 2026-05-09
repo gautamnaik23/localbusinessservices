@@ -11,7 +11,10 @@ const MESSAGES_TAB = 'Conversation History';  // Your messages tab
 export async function saveMessagesBatch(businessId, threadId, messages, channel) {  // messages = [{role, text, replyNeeded, followUp}]
   const sheets = await getSheetsClient();
   const timestamp = formatTimestamp();
-  const sessionId = generateSessionId();
+  let sessionId = generateSessionId();
+  if (channel === 'email') {
+    sessionId = threadId;  // For email, use stable threadId as sessionId
+  }
   
   const values = messages.map(msg => [
     threadId, sessionId, msg.role, msg.text, timestamp, msg.replyNeeded, msg.followUp, businessId, channel
