@@ -96,7 +96,7 @@ export async function sendGmailEmail({
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
   oauth2Client.setCredentials({ refresh_token: refreshToken });
   const accessToken = (await oauth2Client.getAccessToken()).token;
-  if (!accessToken.token) {
+  if (!accessToken) {
     throw new Error('Failed to get Gmail access token');
   }
 
