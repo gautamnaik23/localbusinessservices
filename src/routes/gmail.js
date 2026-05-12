@@ -43,7 +43,7 @@ export async function createGmailTransporter({
   console.log('✅ Access token OK');
   const accessToken = (await oauth2Client.getAccessToken()).token;
 
-  const gmail = google.gmail({ version: 'v1', auth: accessToken });
+  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
   // If we did not get a token, stop immediately.
   if (!accessToken) {
@@ -120,21 +120,98 @@ export async function sendGmailEmail({
       raw: encodedMessage
     }
   });
-/*
-  // Build the Gmail transporter for this business.
-  const transporter = await createGmailTransporter({
-    clientId,
-    clientSecret,
-    refreshToken,
-    email: businessEmail, 
+}
+
+// ===============================
+// GMAIL PUSH WATCH (INBOUND EMAILS)
+// ===============================
+/**
+ * Starts Gmail push notifications for a business inbox.
+ * Call this ONCE when a business connects Gmail.
+ */
+export async function startGmailWatch({
+  clientId,
+  clientSecret,
+  refreshToken
+}) {
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+  const gmail = google.gmail({
+    version: "v1",
+    auth: oauth2Client
   });
 
-  // Send the actual email.
-  // The "from" field should match the connected Gmail account.
-  return transporter.sendMail({
-    from: `${businessName} <${businessEmail}>`,
-    to,
-    subject,
-    html
-  });*/
+  const res = await gmail.users.watch({
+    userId: "me",
+    requestBody: {
+      topicName,
+      labelIds: ["INBOX"] // only inbox emails
+    }
+  });
+
+  console.log("📡 Gmail watch activated:", res.data);
+
+  return {
+    historyId: res.data.historyId,
+    expiration: res.data.expiration
+  };
+}
+
+// ===============================
+// FETCH GMAIL HISTORY CHANGES
+// ===============================
+export async function getGmailHistory({
+  clientId,
+  clientSecret,
+  refreshToken,
+  startHistoryId
+}) {
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+
+  oauth2Client.setCredentials({
+    refresh_token: refreshToken
+  });
+
+  const gmail = google.gmail({
+    version: 'v1',
+    auth: oauth2Client
+  });
+
+  const res = await gmail.users.history.list({
+    userId: 'me',
+    startHistoryId,
+    historyTypes: ['messageAdded']
+  });
+
+  return res.data.history || [];
+}
+
+// ===============================
+// FETCH FULL EMAIL MESSAGE
+// ===============================
+export async function getGmailMessage({
+  clientId,
+  clientSecret,
+  refreshToken,
+  messageId
+}) {
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+
+  oauth2Client.setCredentials({
+    refresh_token: refreshToken
+  });
+
+  const gmail = google.gmail({
+    version: 'v1',
+    auth: oauth2Client
+  });
+
+  const res = await gmail.users.messages.get({
+    userId: 'me',
+    id: messageId,
+    format: 'full'
+  });
+
+  return res.data;
 }
