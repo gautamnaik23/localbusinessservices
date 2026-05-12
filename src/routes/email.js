@@ -6,7 +6,7 @@ import { generateReply } from '../services/ai.js';
 import { senders } from '../services/outbound.js';
 import { generateSessionId } from '../utils/ids.js';
 import { getBusinessFromChannelBot } from '../services/sheets.js';
-import { startGmailWatch, getGmailHistory, getGmailMessage } from "../services/gmail.js";
+import { startGmailWatch, getGmailHistory, getGmailMessage } from "./gmail.js";
 
 const router = Router();
 
