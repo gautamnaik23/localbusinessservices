@@ -13,6 +13,8 @@ import path from "path";               // 4️⃣ File paths (public folder)
 import { fileURLToPath } from "url";   // 5️⃣ Fix __dirname in ES modules
 import { createServer } from "http";   // 6️⃣ HTTP server (Express + Socket.IO)
 import { Server } from "socket.io";    // 7️⃣ WebSocket server (widget realtime)
+import { startGmailWatch } from './services/gmail.js';
+import { getAllBusinesses } from './services/sheets.js';
 
 
 // =====================================================
@@ -58,6 +60,30 @@ app.use("/public", express.static(path.join(__dirname, "..", "public")));
 app.use("/webhook/widget", widgetRoutes);
 app.use("/webhook/telegram", telegramRoutes);
 app.use("/webhook/email", emailRoutes);
+
+// ===============================
+// AUTO START GMAIL WATCH
+// ===============================
+(async () => {
+  try {
+    const businesses = await getAllBusinesses();
+
+    for (const business of businesses) {
+      if (!business.refreshToken) continue;
+
+      await startGmailWatch({
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: business.refreshToken
+      });
+
+      console.log(`📡 Gmail watch started for ${business.businessId}`);
+    }
+
+  } catch (err) {
+    console.error('Failed to initialize Gmail watches:', err);
+  }
+})();
 
 // =====================================================
 // HEALTH CHECK + HOMEPAGE

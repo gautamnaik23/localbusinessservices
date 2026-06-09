@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
     // 1. Load business config FIRST
     const business = await getBusinessConfig(businessid);
     console.log(business);
-
+/*
     // ===============================
     // AUTO START GMAIL WATCH (if not already active)
     // ===============================
@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
     console.log("📡 Gmail watch ensured for:", businessid);
     } catch (err) {
     console.error("⚠️ Gmail watch failed:", err.message);
-    }
+    }*/
 
     // 3. Load conversation history (EXCLUDES current message). use threadId for email to keep history together
     const history = await getThreadHistory(businessid, threadId, threadId);

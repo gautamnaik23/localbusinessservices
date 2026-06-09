@@ -32,7 +32,7 @@ function parseJsonFromText(text) {
 // =====================================================
 // FALLBACK MODELS (High demand → stable fallback)
 // =====================================================
-const PRIMARY_MODEL = "gemini-3.1-flash-lite-preview";
+const PRIMARY_MODEL = "gemini-3.1-flash-lite";
 const FALLBACK_MODEL = "gemini-2.5-flash";  // More stable, slightly slower
 
 /**
