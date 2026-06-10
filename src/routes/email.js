@@ -99,6 +99,7 @@ function detectBusinessFromEmail(fromHeader) {
 // GMAIL PUSH WEBHOOK (INBOUND)
 // ===============================
 router.post('/gmail-push', async (req, res) => {
+  console.log("🔥 GMAIL PUSH HIT");
   try {
     // This endpoint receives Gmail push notifications for new emails in connected business inboxes.
     const pubsubMessage = req.body.message;

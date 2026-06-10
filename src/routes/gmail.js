@@ -145,7 +145,7 @@ export async function startGmailWatch({
   const res = await gmail.users.watch({
     userId: "me",
     requestBody: {
-      topicName,
+      topicName: "projects/chat-widget-492415/topics/gmail-notifications",
       labelIds: ["INBOX"] // only inbox emails
     }
   });
