@@ -13,7 +13,7 @@ import path from "path";               // 4️⃣ File paths (public folder)
 import { fileURLToPath } from "url";   // 5️⃣ Fix __dirname in ES modules
 import { createServer } from "http";   // 6️⃣ HTTP server (Express + Socket.IO)
 import { Server } from "socket.io";    // 7️⃣ WebSocket server (widget realtime)
-import { startGmailWatch } from './services/gmail.js';
+import { startGmailWatch } from './routes/gmail.js';
 import { getAllBusinesses } from './services/sheets.js';
 
 
