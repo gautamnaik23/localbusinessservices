@@ -69,6 +69,7 @@ app.use("/webhook/email", emailRoutes);
     const businesses = await getAllBusinesses();
 
     for (const business of businesses) {
+      if (business.channel !== 'email') continue;  // Only start watches for email channel
       if (!business.refreshToken) continue;
 
       await startGmailWatch({

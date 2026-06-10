@@ -207,6 +207,11 @@ router.post('/gmail-push', async (req, res) => {
 
         //const sessionId = generateSessionId();
 
+        const business = await getBusinessConfig(businessid);
+        if (!business) {
+          console.error(`No business config for ${businessid}`);
+          continue;
+        }
         const priorHistory = await getThreadHistory(
           businessid,
           threadId,

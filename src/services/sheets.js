@@ -156,3 +156,34 @@ export async function getSenderInfo(businessId, channel) {
   }
 
 }
+
+// Fetches all businesses from the BotMappings tab to be used for email
+// Used by server.js to initialize Gmail watches on startup
+export async function getAllBusinesses() {
+  try {
+    const sheets = await getSheetsClient();
+
+    const range = `${SHEET_CONFIG.botTab}!A:D`;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_CONFIG.spreadsheetId,
+      range
+    });
+
+    const rows = response.data.values || [];
+    if (rows.length === 0) return [];
+
+    // Skip header row if present, map each row to a business object
+    return rows
+      .filter(row => row[0] && row[0] !== 'channel') // skip header/empty
+      .map(row => ({
+        channel:    row[0] || '',
+        refreshToken:  row[1] || '',
+        email:  row[2] || '',
+        businessId:   row[3] || ''
+      }));
+
+  } catch (error) {
+    console.error('getAllBusinesses error:', error);
+    return []; // Return empty array so server startup doesn't crash
+  }
+}
