@@ -80,7 +80,7 @@ export async function getBusinessFromChannelBot(channel, secret) {
     });
 
     const rows = response.data.values;
-    console.log(rows);
+    //console.log(rows);
 
     for (const row of rows) {
       const rowChannel = row[0]?.trim();
