@@ -113,6 +113,11 @@ router.post('/gmail-push', async (req, res) => {
       Buffer.from(pubsubMessage.data, 'base64').toString()
     );
 
+    const latestHistoryId = decoded.historyId;
+
+    console.log("Incoming history:", latestHistoryId);
+
+    return res.status(200).send("Ignoring for debugging");
     console.log('📩 Gmail Push:', decoded);
 
     // Extract relevant info from the decoded message
