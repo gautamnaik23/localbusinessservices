@@ -145,10 +145,12 @@ router.post('/gmail-push', async (req, res) => {
 
     // Process each new email in the history
     for (const entry of history) {
-      const messages = entry.messages || [];
+      console.log(JSON.stringify(entry, null, 2));
+      const messagesAdded = entry.messagesAdded || [];
 
-      for (const msg of messages) {
+      for (const added of messagesAdded) {
         // Fetch full message
+        const msg = added.message;
         const fullMessage = await getGmailMessage({
           clientId: process.env.GMAIL_CLIENT_ID,
           clientSecret: process.env.GMAIL_CLIENT_SECRET,
