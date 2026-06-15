@@ -167,6 +167,7 @@ export async function getGmailHistory({
   refreshToken,
   startHistoryId
 }) {
+  console.log("🔥 Fetching Gmail history from ID:", startHistoryId);
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
 
   oauth2Client.setCredentials({

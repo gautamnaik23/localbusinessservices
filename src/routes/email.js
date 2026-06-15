@@ -10,6 +10,8 @@ import { startGmailWatch, getGmailHistory, getGmailMessage } from "./gmail.js";
 
 const router = Router();
 
+
+//Not used currently, but can be adapted for direct email webhooks if needed. The current setup uses Gmail push notifications for new emails in connected inboxes, which then triggers fetching the full email and processing it. This is more reliable than trying to set up a direct email webhook, which Gmail doesn't natively support.
 router.post('/', async (req, res) => {
   try {
     const { 
@@ -96,7 +98,7 @@ function detectBusinessFromEmail(fromHeader) {
 }
 
 // ===============================
-// GMAIL PUSH WEBHOOK (INBOUND)
+// GMAIL PUSH WEBHOOK (INBOUND). Currently set up as a Pub/Sub push endpoint for Gmail history notifications. Not the actual email webhook. 
 // ===============================
 router.post('/gmail-push', async (req, res) => {
   console.log("🔥 GMAIL PUSH HIT");
