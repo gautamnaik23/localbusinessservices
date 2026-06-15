@@ -103,7 +103,7 @@ function detectBusinessFromEmail(fromHeader) {
 router.post('/gmail-push', async (req, res) => {
   console.log("🔥 GMAIL PUSH HIT");
   // Always respond 200 immediately — Gmail will retry if you don't
-  res.status(200).send('ok');
+  //res.status(200).send('ok');
   try {
     // This endpoint receives Gmail push notifications for new emails in connected business inboxes.
     const pubsubMessage = req.body.message;
@@ -121,7 +121,6 @@ router.post('/gmail-push', async (req, res) => {
 
     console.log("Incoming history:", latestHistoryId);
 
-    return res.status(200).send("Ignoring for debugging");
     console.log('📩 Gmail Push:', decoded);
 
     // Extract relevant info from the decoded message
