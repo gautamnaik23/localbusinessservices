@@ -5,7 +5,7 @@ import { getThreadHistory, saveMessagesBatch } from '../services/messages.js';
 import { generateReply } from '../services/ai.js';
 import { senders } from '../services/outbound.js';
 import { generateSessionId } from '../utils/ids.js';
-import { getBusinessFromChannelBot } from '../services/sheets.js';
+import { getBusinessFromChannelBot, setHistoryId, getHistoryId } from '../services/sheets.js';
 import { startGmailWatch, getGmailHistory, getGmailMessage } from "./gmail.js";
 
 const router = Router();
@@ -125,7 +125,6 @@ router.post('/gmail-push', async (req, res) => {
 
     // Extract relevant info from the decoded message
     const emailAddress = decoded.emailAddress;
-    const historyId = decoded.historyId;
 
     // Lookup business by connected Gmail
     const businessInfo = await getBusinessFromChannelBot(
@@ -139,6 +138,8 @@ router.post('/gmail-push', async (req, res) => {
     }
 
     const businessid = businessInfo.businessId;
+    const historyId = await getHistoryId(businessid);
+    await setHistoryId(businessid, latestHistoryId);  // Update stored historyId for next fetch
     const refreshToken = businessInfo.token;
 
     // Fetch Gmail history changes
