@@ -123,6 +123,68 @@ export async function sendGmailEmail({
   });
 }
 
+/*
+export async function sendGmailEmail({
+  to,
+  subject,
+  html,
+  businessName,
+  businessEmail,
+  clientId,
+  clientSecret,
+  refreshToken,
+  threadId,
+  inReplyTo,
+  references
+}) {
+  // Create an OAuth client for this business's Gmail account
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+
+  // Load the saved refresh token so Google can mint a new access token
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+  // Build the Gmail API client using the OAuth client
+  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+  // Build the email headers
+  // For threaded replies, Gmail cares about Subject, In-Reply-To, and References
+  const headers = [
+    `From: ${businessName} <${businessEmail}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/html; charset=utf-8'
+  ];
+
+  // Add reply headers only when replying to an existing email
+  if (inReplyTo) headers.splice(3, 0, `In-Reply-To: <${inReplyTo}>`);
+  if (references) headers.splice(4, 0, `References: <${references}>`);
+
+  // Combine headers and HTML body into a raw RFC 2822 message
+  const message = [...headers, '', html].join('\r\n');
+
+  // Gmail API expects base64url encoding, not plain base64
+  const encodedMessage = Buffer.from(message)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  console.log(`📧 Sending Gmail to ${to}: ${subject}`);
+
+  // Send the message.
+  // threadId is what tells Gmail which conversation this belongs to.
+  await gmail.users.messages.send({
+    userId: 'me',
+    requestBody: {
+      raw: encodedMessage,
+      ...(threadId ? { threadId } : {})
+    }
+  });
+}
+*/
+
+
 // ===============================
 // GMAIL PUSH WATCH (INBOUND EMAILS)
 // ===============================

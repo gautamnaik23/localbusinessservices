@@ -243,6 +243,12 @@ router.post('/gmail-push', async (req, res) => {
           'email'
         );
 
+        console.log("Refresh token exists:", !!refreshToken);
+        console.log(
+          "Refresh token preview:",
+          refreshToken ? refreshToken.slice(0, 20) + "..." : "NONE"
+        );
+        console.log("business Info:", businessInfo);
         // Send AI reply
         await senders.email({
           customerEmailAddress: customer_email,
