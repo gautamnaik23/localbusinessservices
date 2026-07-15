@@ -237,19 +237,19 @@ router.post('/gmail-push', async (req, res) => {
         });
 
         // Save messages
-        await saveMessagesBatch(businessid, threadId,
+        await saveMessagesBatch(businessid, {threadId, customer_email},
           [{role: 'user', text: body, replyNeeded: false, followUp: false},
             {role: 'ai', text: aiResponse.message, replyNeeded: aiResponse.expecting_reply, followUp: false}],
           'email'
         );
 
         // Send AI reply
-        await senders.email(
-          customer_email,
-          emailAddress,
-          aiResponse.message,
+        await senders.email({
+          customerEmailAddress: customer_email,
+          businessEmailAddress: emailAddress,
+          message: aiResponse.message,
           business,
-          refreshToken
+          senderRefreshToken: refreshToken}
         );
 
         console.log('✅ AI email reply sent');

@@ -5,7 +5,7 @@ import { io } from '../server.js';
 import { sendGmailEmail } from '../routes/gmail.js';
 
 export const senders = {
-  widget: async (threadId, message, sender) => {
+  widget: async ({threadId, message}) => {
     // Widget push (WebSocket or HTTP)
     const nudgeId = `nudge_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     console.log(`🚀 EMIT NUDGE [${nudgeId}]: ${threadId} → ${message.slice(0,50)}`);
@@ -13,16 +13,16 @@ export const senders = {
     io.to(threadId).emit('nudge', { message });
     return true;
   },
-  telegram: async (chatId, message, sender) => {
+  telegram: async ({threadId, message, sender}) => {
     // Telegram Bot API
     await fetch(`https://api.telegram.org/bot${sender}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: message })
+      body: JSON.stringify({ chat_id: threadId, text: message })
     });
     return true;
   },
-  email: async (customeremailAddress, businessEmailAddress, message, business, senderRefreshToken) => {
+  email: async ({customeremailAddress, businessEmailAddress, message, business, sender}) => {
     console.log(`📧 Email reply: ${customeremailAddress} → ${message.slice(0,50)}`);
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
@@ -44,11 +44,11 @@ export const senders = {
       businessEmail: businessEmailAddress,
       clientId: clientId,
       clientSecret: clientSecret,
-      refreshToken: senderRefreshToken
+      refreshToken: sender
     });
     return true;
   },
-  sms: async (phone, message) => {
+  sms: async ({phone, message}) => {
     // Twilio/Resend/etc (add API key to .env)
     console.log(`SMS nudge: ${phone} → ${message}`);
     return true;  // TODO: Real SMS

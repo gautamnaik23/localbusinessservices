@@ -78,7 +78,15 @@ export function startFollowUpJob() {
         const nudgeMsg = await generateFollowUp(history, business);
   
         // 4. Send via channel
-        const success = await senders[thread.channel]?.(thread.threadId, nudgeMsg, sender);
+        //const success = await senders[thread.channel]?.(thread.threadId, nudgeMsg, sender);
+        const success = await senders[thread.channel]?.({
+                threadId: thread.threadId,
+                customerEmailAddress: thread.sessionId,  // For email, sessionId is the customer email address
+                businessEmailAddress: business.email,
+                message: nudgeMsg,
+                business,
+                sender: sender
+              });
   
         if (success) {
             await markFollowUpSent(sheets, thread.rowIndex);

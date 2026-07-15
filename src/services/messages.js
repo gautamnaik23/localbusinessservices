@@ -13,7 +13,8 @@ export async function saveMessagesBatch(businessId, threadId, messages, channel)
   const timestamp = formatTimestamp();
   let sessionId = generateSessionId();
   if (channel === 'email') {
-    sessionId = threadId;  // For email, use stable threadId as sessionId
+    sessionId = threadId[1];  // For email, thread id is a set where index 0 is the actual threadid and index 1 is the customer email address. to be stored as session id. Used for followups
+    threadId = threadId[0];  
   }
   
   const values = messages.map(msg => [
