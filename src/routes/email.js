@@ -255,7 +255,7 @@ router.post('/gmail-push', async (req, res) => {
           businessEmailAddress: emailAddress,
           message: aiResponse.message,
           business,
-          senderRefreshToken: refreshToken}
+          sender: refreshToken}
         );
 
         console.log('✅ AI email reply sent');
