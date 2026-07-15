@@ -14,7 +14,7 @@ import { fileURLToPath } from "url";   // 5️⃣ Fix __dirname in ES modules
 import { createServer } from "http";   // 6️⃣ HTTP server (Express + Socket.IO)
 import { Server } from "socket.io";    // 7️⃣ WebSocket server (widget realtime)
 import { startGmailWatch } from './routes/gmail.js';
-import { getAllBusinesses } from './services/sheets.js';
+import { getAllBusinesses, getHistoryId, setHistoryId } from './services/sheets.js';
 
 
 // =====================================================
@@ -72,13 +72,27 @@ app.use("/webhook/email", emailRoutes);
       if (business.channel !== 'email') continue;  // Only start watches for email channel
       if (!business.refreshToken) continue;
 
-      await startGmailWatch({
-        clientId: process.env.GMAIL_CLIENT_ID,
-        clientSecret: process.env.GMAIL_CLIENT_SECRET,
-        refreshToken: business.refreshToken
-      });
+      // Check if we already have a historyId stored
+      const existing = await getHistoryId(business.businessId);
 
-      console.log(`📡 Gmail watch started for ${business.businessId}`);
+      if (existing) {
+        // Already seeded — just renew the watch (required every 7 days)
+        await startGmailWatch({
+          clientId: process.env.GMAIL_CLIENT_ID,
+          clientSecret: process.env.GMAIL_CLIENT_SECRET,
+          refreshToken: business.refreshToken
+        });
+        console.log(`📡 Gmail watch renewed for ${business.businessId}, using stored historyId: ${existing}`);
+      } else {
+        // First time setup — seed from watch response
+        const { historyId } = await startGmailWatch({
+          clientId: process.env.GMAIL_CLIENT_ID,
+          clientSecret: process.env.GMAIL_CLIENT_SECRET,
+          refreshToken: business.refreshToken
+        });
+        await setHistoryId(business.businessId, historyId);
+        console.log(`📡 Gmail watch started for ${business.businessId}, seeded historyId: ${historyId}`);
+      }
     }
 
   } catch (err) {

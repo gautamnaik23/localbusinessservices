@@ -10,7 +10,8 @@ const SHEET_CONFIG = {
   conversationTab: "Conversation History", // Your first tab name
   appointmentsTab: "AppointmentFakeTable",  // Your second tab name
   businessTab: "Business Information",
-  botTab: "BotMappings"
+  botTab: "BotMappings",
+  emailHistoryTab: "Email History"
 };
 
 // Auth setup - converts the PEM key from environment variable format
@@ -151,7 +152,7 @@ export async function getSenderInfo(businessId, channel) {
     console.log("❌ No mapping found for:", { channel, businessId });
     return null;
   } catch (error) {
-    console.error("❌ getBusinessFromChannelBot error:", error);
+    console.error("❌ getSenderInfo error:", error);
     return null;
   }
 
@@ -185,5 +186,75 @@ export async function getAllBusinesses() {
   } catch (error) {
     console.error('getAllBusinesses error:', error);
     return []; // Return empty array so server startup doesn't crash
+  }
+}
+
+// Get the last known historyId for a business id
+export async function getHistoryId(businessId) {
+  try {
+    const sheets = await getSheetsClient();
+
+    const range = `${SHEET_CONFIG.emailHistoryTab}!A:B`;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_CONFIG.spreadsheetId,
+      range
+    });
+
+    const rows = response.data.values || [];
+
+    const match = rows.find(row => row[0]?.trim() === businessId);
+    if (!match) {
+      console.log(`⚠️ No historyId found in sheet for: ${businessId}`);
+      return null;
+    }
+
+    console.log(`📖 Loaded historyId for ${businessId}: ${match[1]}`);
+    return match[1] || null;
+
+  } catch (error) {
+    console.error('getHistoryId error:', error);
+    return null;
+  }
+}
+
+// Update or insert the historyId for a business email
+export async function setHistoryId(businessId, historyId) {
+  try {
+    const sheets = await getSheetsClient();
+
+    const range = `${SHEET_CONFIG.emailHistoryTab}!A:B`;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_CONFIG.spreadsheetId,
+      range
+    });
+
+    const rows = response.data.values || [];
+
+    // Find existing row index (1-based for Sheets API)
+    const rowIndex = rows.findIndex(row => row[0]?.trim() === businessId);
+
+    if (rowIndex === -1) {
+      // Business ID not found — append a new row
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_CONFIG.spreadsheetId,
+        range: `${SHEET_CONFIG.emailHistoryTab}!A:B`,
+        valueInputOption: 'RAW',
+        resource: { values: [[businessId, String(historyId)]] }
+      });
+      console.log(`➕ Inserted historyId for ${businessId}: ${historyId}`);
+    } else {
+      // Row exists — update column B in that row
+      const sheetRow = rowIndex + 1; // Sheets rows are 1-indexed
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_CONFIG.spreadsheetId,
+        range: `${SHEET_CONFIG.emailHistoryTab}!B${sheetRow}`,
+        valueInputOption: 'RAW',
+        resource: { values: [[String(historyId)]] }
+      });
+      console.log(`✏️ Updated historyId for ${businessId}: ${historyId}`);
+    }
+
+  } catch (error) {
+    console.error('setHistoryId error:', error);
   }
 }
