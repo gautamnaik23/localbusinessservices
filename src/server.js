@@ -142,7 +142,7 @@ export { io };
 // START JOBS (After server ready)
 // =====================================================
 // ✅ Cron jobs (follow-up emails/texts)
-//startFollowUpJob();
+startFollowUpJob();
 
 
 // =====================================================

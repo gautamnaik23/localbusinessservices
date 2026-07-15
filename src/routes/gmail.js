@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
+import {setHistoryId, getHistoryId} from '../services/sheets.js';
 
 // We use Google's OAuth2 client to get short-lived access tokens.
 // The refresh token stays stored in your business config.
