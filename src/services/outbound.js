@@ -22,14 +22,14 @@ export const senders = {
     });
     return true;
   },
-  email: async ({customeremailAddress, businessEmailAddress, message, business, sender}) => {
-    console.log(`📧 Email reply: ${customeremailAddress} → ${message.slice(0,50)}`);
+  email: async ({customerEmailAddress, businessEmailAddress, message, business, sender}) => {
+    console.log(`📧 Email reply: ${customerEmailAddress} → ${message.slice(0,50)}`);
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
 
     // Send the reply using the business's connected Gmail account.
     await sendGmailEmail({
-      to: customeremailAddress,
+      to: customerEmailAddress,
       subject: 'Re: Your inquiry',
       html: `
         <p>${message}</p>
