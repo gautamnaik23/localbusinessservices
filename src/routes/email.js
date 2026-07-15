@@ -237,7 +237,7 @@ router.post('/gmail-push', async (req, res) => {
         });
 
         // Save messages
-        await saveMessagesBatch(businessid, {threadId, customer_email},
+        await saveMessagesBatch(businessid, [threadId, customer_email],
           [{role: 'user', text: body, replyNeeded: false, followUp: false},
             {role: 'ai', text: aiResponse.message, replyNeeded: aiResponse.expecting_reply, followUp: false}],
           'email'
