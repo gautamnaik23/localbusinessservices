@@ -72,7 +72,11 @@ export function startFollowUpJob() {
         
         // 2. Get business config
         const business = await getBusinessConfig(thread.businessId);
-        const sender = await getSenderInfo(thread.businessId, thread.channel);
+        
+        let sender;
+        if (thread.channel !== 'widget') {
+            sender = await getSenderInfo(thread.businessId, thread.channel);
+        }
         
         // 3. AI generates personalized nudge
         const nudgeMsg = await generateFollowUp(history, business);
