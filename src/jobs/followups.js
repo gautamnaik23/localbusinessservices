@@ -8,6 +8,7 @@ import { getThreadHistory } from '../services/messages.js';
 import { getBusinessConfig } from '../services/business.js';
 import { generateHourDifference, splitDateTime } from '../utils/ids.js';
 import { getSenderInfo } from '../services/sheets.js';
+import { getLatestMessageInThread } from '../routes/gmail.js';
 
 const SHEET_ID = '1R0XrgG_TaFesa5feugAV9cAoUOHJye1G7uVJ7X_QgyM'
 const MESSAGES_TAB = 'Conversation History';
@@ -80,17 +81,36 @@ export function startFollowUpJob() {
         
         // 3. AI generates personalized nudge
         const nudgeMsg = await generateFollowUp(history, business);
+
+        // 3.5 For email, look up the original Message-ID/Subject so the
+        // reply threads correctly instead of starting a new email chain.
+        let inReplyTo, subject;
+        if (thread.channel === 'email') {
+          try {
+            const latest = await getLatestMessageInThread({
+              clientId: process.env.GMAIL_CLIENT_ID,
+              clientSecret: process.env.GMAIL_CLIENT_SECRET,
+              refreshToken: sender,
+              threadId: thread.threadId
+            });
+            inReplyTo = latest?.messageId;
+            subject = latest?.subject;
+          } catch (err) {
+            console.error('⚠️ Could not fetch thread info for follow-up, sending as new:', err.message);
+          }
+        }
   
         // 4. Send via channel
-        //const success = await senders[thread.channel]?.(thread.threadId, nudgeMsg, sender);
         const success = await senders[thread.channel]?.({
                 threadId: thread.threadId,
                 customerEmailAddress: thread.sessionId,  // For email, sessionId is the customer email address
                 businessEmailAddress: business.email,
                 message: nudgeMsg,
                 business,
-                sender: sender
-              });
+                sender: sender, 
+                inReplyTo,
+                subject
+            });
   
         if (success) {
             await markFollowUpSent(sheets, thread.rowIndex);

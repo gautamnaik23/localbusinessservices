@@ -174,6 +174,8 @@ router.post('/gmail-push', async (req, res) => {
 
         const subject =
           headers.find(h => h.name === 'Subject')?.value || '';
+        const messageIdHeader =
+          headers.find(h => h.name.toLowerCase() === 'message-id')?.value || '';
 
         const threadId = fullMessage.threadId;
 
@@ -255,7 +257,11 @@ router.post('/gmail-push', async (req, res) => {
           businessEmailAddress: emailAddress,
           message: aiResponse.message,
           business,
-          sender: refreshToken}
+          sender: refreshToken, 
+          threadId,
+          inReplyTo: messageIdHeader,
+          subject
+        }
         );
 
         console.log('✅ AI email reply sent');

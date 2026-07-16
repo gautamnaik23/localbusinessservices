@@ -22,15 +22,51 @@ export const senders = {
     });
     return true;
   },
-  email: async ({customerEmailAddress, businessEmailAddress, message, business, sender}) => {
+  email: async ({customerEmailAddress, businessEmailAddress, message, business, sender, threadId, inReplyTo, subject}) => {
     console.log(`📧 Email reply: ${customerEmailAddress} → ${message.slice(0,50)}`);
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+    // Reuse the original subject with "Re:" so it reads naturally,
+    // falling back if we somehow don't have one.
+    const replySubject = subject
+    ? (subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`)
+    : 'Re: Your inquiry';
 
     // Send the reply using the business's connected Gmail account.
     await sendGmailEmail({
       to: customerEmailAddress,
-      subject: 'Re: Your inquiry',
+      subject: replySubject,
+      html: `
+        <p>${message}</p>
+        <hr>
+        <small>
+          ${business.businessName}<br>
+          ${business.phoneNumber || ''}<br>
+          <a href="${business.bookingLink || '#'}">Book Now</a>
+        </small>
+      `,
+      businessName: business.businessName,
+      businessEmail: businessEmailAddress,
+      clientId: clientId,
+      clientSecret: clientSecret,
+      refreshToken: sender,
+      threadId,
+      inReplyTo,
+      references: inReplyTo
+    });
+    return true;
+  },
+  email_followup: async ({customerEmailAddress, businessEmailAddress, message, business, sender}) => {
+    console.log(`📧 Email reply: ${customerEmailAddress} → ${message.slice(0,50)}`);
+    const clientId = process.env.GMAIL_CLIENT_ID;
+    const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+    // Reuse the original subject with "Re:" so it reads naturally,
+    // falling back if we somehow don't have one.
+
+    // Send the reply using the business's connected Gmail account.
+    await sendGmailEmail({
+      to: customerEmailAddress,
+      subject: 'Re: Your Inquiry',
       html: `
         <p>${message}</p>
         <hr>
@@ -53,7 +89,6 @@ export const senders = {
     console.log(`SMS nudge: ${phone} → ${message}`);
     return true;  // TODO: Real SMS
   },
-  // Add email, form, etc.
 };
 
 senders.send = (channel, threadId, message, sender) => senders[channel]?.(threadId, message, sender);

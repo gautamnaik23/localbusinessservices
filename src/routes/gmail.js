@@ -73,6 +73,7 @@ export async function createGmailTransporter({
   });
 }
 
+
 /**
  * Send one email through the business's Gmail account.
  *
@@ -83,7 +84,7 @@ export async function createGmailTransporter({
  * - fromName: business display name
  * - fromEmail: business Gmail address
  * - clientId/clientSecret/refreshToken: OAuth credentials for that business
- */
+ 
 export async function sendGmailEmail({
   to,
   subject,
@@ -122,8 +123,9 @@ export async function sendGmailEmail({
     }
   });
 }
+*/
 
-/*
+
 export async function sendGmailEmail({
   to,
   subject,
@@ -143,6 +145,10 @@ export async function sendGmailEmail({
   // Load the saved refresh token so Google can mint a new access token
   oauth2Client.setCredentials({ refresh_token: refreshToken });
 
+  const accessToken = (await oauth2Client.getAccessToken()).token;
+  if (!accessToken) {
+    throw new Error('Failed to get Gmail access token');
+  }
   // Build the Gmail API client using the OAuth client
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
@@ -156,9 +162,13 @@ export async function sendGmailEmail({
     'Content-Type: text/html; charset=utf-8'
   ];
 
-  // Add reply headers only when replying to an existing email
-  if (inReplyTo) headers.splice(3, 0, `In-Reply-To: <${inReplyTo}>`);
-  if (references) headers.splice(4, 0, `References: <${references}>`);
+  // These two headers are what makes mail clients (and Gmail itself)
+  // treat this as a reply instead of a new conversation.
+  if (inReplyTo) {
+    const wrap = (id) => (id.startsWith('<') ? id : `<${id}>`);
+    headers.push(`In-Reply-To: ${wrap(inReplyTo)}`);
+    headers.push(`References: ${wrap(references || inReplyTo)}`);
+  }
 
   // Combine headers and HTML body into a raw RFC 2822 message
   const message = [...headers, '', html].join('\r\n');
@@ -170,7 +180,8 @@ export async function sendGmailEmail({
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
-  console.log(`📧 Sending Gmail to ${to}: ${subject}`);
+  console.log(`📧 Sending Gmail to ${to}: ${subject}${threadId ? ` (thread ${threadId})` : ''}`);
+
 
   // Send the message.
   // threadId is what tells Gmail which conversation this belongs to.
@@ -182,7 +193,7 @@ export async function sendGmailEmail({
     }
   });
 }
-*/
+
 
 
 // ===============================
@@ -278,4 +289,40 @@ export async function getGmailMessage({
   });
 
   return res.data;
+}
+
+// ===============================
+// GET LATEST MESSAGE IN AN EMAIL THREAD (for follow-up reply threading)
+// ===============================
+/**
+ * Fetches the Message-ID and Subject of the most recent message in a Gmail thread.
+ * Used so follow-ups can reply into the existing thread instead of starting a new one.
+ */
+export async function getLatestMessageInThread({
+  clientId,
+  clientSecret,
+  refreshToken,
+  threadId
+}) {
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+  const res = await gmail.users.threads.get({
+    userId: 'me',
+    id: threadId,
+    format: 'metadata',
+    metadataHeaders: ['Message-Id', 'Subject']
+  });
+
+  const messages = res.data.messages || [];
+  const last = messages[messages.length - 1];
+  if (!last) return null;
+
+  const headers = last.payload.headers || [];
+  const messageId = headers.find(h => h.name.toLowerCase() === 'message-id')?.value || '';
+  const subject = headers.find(h => h.name.toLowerCase() === 'subject')?.value || '';
+
+  return { messageId, subject };
 }
