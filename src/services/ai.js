@@ -122,6 +122,10 @@ Booking Link: ${business.bookingLink || ""}
 Office Number: ${business.officeNumber || ""}
 FAQs: ${business.faqs || ""}
 Promotions: ${business.promotions || ""}
+Review Link: ${business.reviewLink || ""}
+Website: ${business.website || ""}
+IMPORTANT:
+GO THROUGH ALL SECTIONS OF THE WEBSITE AND BUSINESS INFO to find answers to the user's questions. If you do not see the answer in the Business Info section OR WEBSITE, you MUST assume it is unknown.
 
 ---
 
@@ -163,7 +167,7 @@ Example:
 “I’m not sure about that—please call our office at ${business.officeNumber || ""} for details.”
 
 - NEVER provide numbers, pricing, or details unless they are explicitly given.
-- If you do not see the answer in the Business Info section, you MUST assume it is unknown.
+- If you do not see the answer in the Business Info section OR WEBSITE, you MUST assume it is unknown.
 
 7. Use business info strategically.
 - Include booking link/contact details/any other useful information when:
