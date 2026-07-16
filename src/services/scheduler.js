@@ -6,14 +6,15 @@ import { senders } from './outbound.js';
 import checkAllReviews from './reviews.js';
 
 // Every 10 minute
-//cron.schedule('* * * * *', () => {
-cron.schedule('*/10 * * * *', () => {
+cron.schedule('* * * * *', () => {
+//cron.schedule('*/10 * * * *', () => {
   console.log('🕐 Running reminders...');
   checkAllReminders();
 });
 
 //Sending out Review Requests
-cron.schedule('*/10 * * * *', () => {
+cron.schedule('* * * * *', () => {
+//cron.schedule('*/10 * * * *', () => {
   checkAllReviews();
 });
 
