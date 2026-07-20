@@ -54,12 +54,14 @@ export async function checkAllReminders() {
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
       
       const sender = await getSenderInfo(businessId, channel);
-      await senders.send(channel, threadId, reviewMsg, sender);
-      //await sendNudge(threadId, {
-      //message: reviewMsg
-      //}, channel, sender);
+      //await senders.send(channel, threadId, reviewMsg, sender);
+      //Can Not Be Used for Email. Only Telegram, Widget, And Text. 
+      const success = await senders[channel]?.({
+                threadId: threadId,
+                message: reviewMsg,
+                sender: sender, 
+            });
       await markSent(sheets, rowIdx, CONFIG.cols.reminder2h);
-      await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);
       continue
     }
 
@@ -71,10 +73,13 @@ export async function checkAllReminders() {
       await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
       
       const sender = await getSenderInfo(businessId, channel);
-      await senders.send(channel, threadId, reviewMsg, sender);
-      //await sendNudge(threadId, {
-      //message: reviewMsg
-      //}, channel, sender);
+      //await senders.send(channel, threadId, reviewMsg, sender);
+      //Can Not Be Used for Email. Only Telegram, Widget, And Text. 
+      const success = await senders[channel]?.({
+                threadId: threadId,
+                message: reviewMsg,
+                sender: sender, 
+            });
       await markSent(sheets, rowIdx, CONFIG.cols.reminder24h);  // Pass rowIdx
     }
     

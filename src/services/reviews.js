@@ -58,10 +58,13 @@ export async function checkAllReviews() {
         await saveMessagesBatch(businessId, threadId, [{role: 'ai', text: reviewMsg, replyNeeded: false, followUp: false}], channel);
 
         const sender = await getSenderInfo(businessId, channel);
-        await senders.send(channel, threadId, reviewMsg, sender);
-        //await sendNudge(threadId, {
-        //  message: reviewMsg
-        //}, channel, sender);
+        //await senders.send(channel, threadId, reviewMsg, sender);
+        //Can Not Be Used for Email. Only Telegram, Widget, And Text. 
+        const success = await senders[channel]?.({
+                threadId: threadId,
+                message: reviewMsg,
+                sender: sender, 
+            });
         await markReviewSent(sheets, rowIdx, CONFIG.cols.reviewSent);
         console.log(`⭐ Review request → ${threadId} (${channel})`);
       } catch (err) {
