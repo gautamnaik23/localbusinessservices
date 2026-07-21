@@ -56,10 +56,11 @@ router.post('/', async (req, res) => {
     ], 'telegram');
 
     // Send reply back to Telegram
-    await senders.telegram({
-      chatId: chatId.toString(),
+    //Can Not Be Used for Email. Only Telegram, Widget, And Text. 
+    await senders['telegram']?.({
+      threadId: chatId.toString(),
       message: aiResponse.message,
-      sender
+      sender: sender, 
     });
 
     res.json({ ok: true });
